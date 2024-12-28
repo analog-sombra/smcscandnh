@@ -1,0 +1,216 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+enum Status {
+    ACTIVE
+    INACTIVE
+}
+
+enum Role {
+    NONE
+    SYSTEM
+    ADMIN
+    SCAN
+    META
+    QC
+    MOD
+    DEPARTMENT
+    USER
+    NEC
+    VERIFY
+    SUPERVISOR
+}
+
+model user {
+    id          Int         @id @default(autoincrement())
+    username    String      @unique
+    password    String
+    role        Role        @default(NONE)
+    status      Status      @default(ACTIVE)
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    deletedAt   DateTime?
+    sup_user    file_base[] @relation("sup_user")
+    mod_user    file_base[] @relation("mod_user")
+    scan_user   file_base[] @relation("scan_user")
+    meta_user   file_base[] @relation("meta_user")
+    qc_user     file_base[] @relation("qc_user")
+    verify_user file_base[] @relation("verify_user")
+
+    created_by_file_base file_base[] @relation("created_by_file_base")
+    updated_by_file_base file_base[] @relation("updated_by_file_base")
+    deleted_by_file_base file_base[] @relation("deleted_by_file_base")
+
+    created_by_file file[] @relation("created_by_file")
+    updated_by_file file[] @relation("updated_by_file")
+    deleted_by_file file[] @relation("deleted_by_file")
+}
+
+model file_base {
+    id           Int       @id @default(autoincrement())
+    fileid       String    @unique
+    is_sup       Boolean
+    is_mod       Boolean
+    is_scan      Boolean
+    is_meta      Boolean
+    is_qc        Boolean
+    is_verify    Boolean
+    sup          user?     @relation("sup_user", fields: [supid], references: [id])
+    supid        Int?
+    sup_start    DateTime?
+    sup_end      DateTime?
+    mod          user?     @relation("mod_user", fields: [modid], references: [id])
+    modid        Int?
+    mod_start    DateTime?
+    mod_end      DateTime?
+    scan         user?     @relation("scan_user", fields: [scanid], references: [id])
+    scanid       Int?
+    scan_start   DateTime?
+    scan_end     DateTime?
+    meta         user?     @relation("meta_user", fields: [metaid], references: [id])
+    metaid       Int?
+    meta_start   DateTime?
+    meta_end     DateTime?
+    qc           user?     @relation("qc_user", fields: [qcid], references: [id])
+    qcid         Int?
+    qc_start     DateTime?
+    qc_end       DateTime?
+    verify       user?     @relation("verify_user", fields: [verifyid], references: [id])
+    verifyid     Int?
+    verify_start DateTime?
+    verify_end   DateTime?
+    remark       String?
+    status       Status    @default(ACTIVE)
+    createdAt    DateTime  @default(now())
+    createdBy    user?     @relation("created_by_file_base", fields: [createdById], references: [id])
+    createdById  Int?
+    updatedAt    DateTime  @updatedAt
+    updatedBy    user?     @relation("updated_by_file_base", fields: [updatedById], references: [id])
+    updatedById  Int?
+    deletedAt    DateTime?
+    deletedBy    user?     @relation("deleted_by_file_base", fields: [deletedById], references: [id])
+    deletedById  Int?
+    file         file[]
+}
+
+model file {
+    id                       Int                     @id @default(autoincrement())
+    filebase                 file_base?              @relation(fields: [filebaseId], references: [id])
+    filebaseId               Int?
+    fileid                   String                  @unique
+    file_no                  String?
+    fts_no                   String?
+    filename                 String?
+    file_type                file_type?              @relation(fields: [file_typeId], references: [id])
+    file_typeId              Int?
+    physical_file_location   physical_file_location? @relation(fields: [physical_file_locationId], references: [id])
+    physical_file_locationId Int?
+    village                  village?                @relation(fields: [villageId], references: [id])
+    villageId                Int?
+    small_page_count         String?
+    mid_page_count           String?
+    large_page_count         String?
+    year                     String?
+    status                   Status                  @default(ACTIVE)
+    createdAt                DateTime                @default(now())
+    createdBy                user?                   @relation("created_by_file", fields: [createdById], references: [id])
+    createdById              Int?
+    updatedAt                DateTime                @updatedAt
+    updatedBy                user?                   @relation("updated_by_file", fields: [updatedById], references: [id])
+    updatedById              Int?
+    deletedAt                DateTime?
+    deletedBy                user?                   @relation("deleted_by_file", fields: [deletedById], references: [id])
+    deletedById              Int?
+    file_name                file_name[]
+    file_survey              file_survey[]
+    problem_file             problem_file[]
+}
+
+model village {
+    id          Int           @id @default(autoincrement())
+    name        String
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    deletedAt   DateTime?
+    file_survey file_survey[]
+    file        file[]
+}
+
+model file_name {
+    id        Int       @id @default(autoincrement())
+    name      String
+    file      file      @relation(fields: [fileId], references: [id])
+    fileId    Int
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+}
+
+model file_survey {
+    id            Int       @id @default(autoincrement())
+    survey_number String
+    file          file      @relation(fields: [fileId], references: [id])
+    fileId        Int
+    village       village   @relation(fields: [villageId], references: [id])
+    villageId     Int
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    deletedAt     DateTime?
+
+    @@unique([survey_number, villageId, fileId])
+}
+
+model file_type {
+    id        Int       @id @default(autoincrement())
+    name      String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+    file      file[]
+}
+
+enum LocationStatus {
+    ACTIVE
+    INACTIVE
+}
+
+model physical_file_location {
+    id             Int            @id @default(autoincrement())
+    cupboard_numer String?
+    shelf_number   String?
+    shelf_location String?
+    status         LocationStatus @default(ACTIVE)
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    deletedAt      DateTime?
+    file           file[]
+}
+
+enum ProblemStatus {
+    NONE
+    PENDING
+    RESOLVED
+    COMPLETED
+}
+
+model problem_file {
+    id               Int           @id @default(autoincrement())
+    file             file          @relation(fields: [fileId], references: [id])
+    fileId           Int
+    remarks          String?       @db.MediumText
+    wrong_file_id    Boolean
+    meta_improper    Boolean
+    improper_scan    Boolean
+    full_rescan      Boolean
+    wrong_page_count Boolean
+    corrupt_file     Boolean
+    status           ProblemStatus @default(PENDING)
+    createdAt        DateTime      @default(now())
+    updatedAt        DateTime      @updatedAt
+}
