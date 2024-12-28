@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import GetQcFile from "@/actions/qc/getqcfile";
 import QcRequestFile from "@/actions/qc/qcreqfile";
