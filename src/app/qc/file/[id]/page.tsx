@@ -2,12 +2,15 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import GetfileById from "@/actions/file/getfilebyid";
+import SubmitQcFile from "@/actions/qc/submitqc";
 import { decryptURLData } from "@/utils/methods";
 import { file, file_type, village } from "@prisma/client";
-import { Button, Divider, Switch } from "antd";
-import TextArea from "antd/es/input/TextArea";
+import { Button, Divider, Switch, Input } from "antd";
+import { getCookie } from "cookies-next/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+const { TextArea } = Input;
 
 const QcFilePage = () => {
   const router = useRouter();
@@ -37,6 +40,58 @@ const QcFilePage = () => {
     };
     init();
   }, []);
+
+  const [remark, setRemark] = useState<string | undefined>(undefined);
+
+  interface Problems {
+    wrong_cover: boolean;
+    wrong_meta: boolean;
+    improper_scan: boolean;
+    full_scan: boolean;
+    wrong_page_count: boolean;
+    corrupt_file: boolean;
+  }
+
+  const [problem, setProblem] = useState<Problems>({
+    corrupt_file: false,
+    full_scan: false,
+    improper_scan: false,
+    wrong_cover: false,
+    wrong_meta: false,
+    wrong_page_count: false,
+  });
+
+  const onsubmit = async () => {
+    const id = getCookie("id");
+
+    if (id == null) {
+      toast.error("User not found");
+      return router.push("/login");
+    }
+
+    if (remark == null || remark == undefined || remark == "") {
+      return toast.error("Enter remark");
+    }
+
+    const response = await SubmitQcFile({
+      id: fileid,
+      created_by: parseInt(id),
+      remark: remark,
+      wrong_page_count: problem.wrong_page_count,
+      corrupt_file: problem.corrupt_file,
+      full_rescan: problem.full_scan,
+      improper_scan: problem.improper_scan,
+      meta_improper: problem.wrong_meta,
+      wrong_cover: problem.wrong_cover,
+      wrong_file_id: false,
+    });
+    if (response.data && response.status) {
+      toast.success(response.message);
+      router.back();
+    } else {
+      return toast.error(response.message);
+    }
+  };
 
   if (isLoading)
     return (
@@ -86,43 +141,34 @@ const QcFilePage = () => {
         placeholder="Remarks"
         className="h-full w-full mt-3"
         style={{ resize: "none" }}
+        value={remark}
+        onChange={(e) => setRemark(e.target.value)}
       />
       <div className="grid grid-cols-3 w-full mt-2">
-        <div className="border p-2 flex gap-2 items-center">
-          <p className="text-sm">Wrong File Cover</p>
-          <div className="grow"></div>
-          <Switch defaultChecked size="small" />
-        </div>
-        <div className="border p-2 flex gap-2 items-center">
-          <p className="text-sm">Wrong Meta</p>
-          <div className="grow"></div>
-
-          <Switch defaultChecked size="small" />
-        </div>
-        <div className="border p-2 flex gap-1 items-center">
-          <p className="text-sm">Improper Scanning</p>
-          <div className="grow"></div>
-          <Switch defaultChecked size="small" />
-        </div>
-        <div className="border p-2 flex gap-1 items-center">
-          <p className="text-sm">Full Scanning</p>
-          <div className="grow"></div>
-          <Switch defaultChecked size="small" />
-        </div>
-        <div className="border p-2 flex gap-1 items-center">
-          <p className="text-sm">Wrong Page Count</p>
-          <div className="grow"></div>
-          <Switch defaultChecked size="small" />
-        </div>
-        <div className="border p-2 flex gap-1 items-center">
-          <p className="text-sm">Corrupt File</p>
-          <div className="grow"></div>
-          <Switch defaultChecked size="small" />
-        </div>
+        {[
+          { label: "Wrong File Cover", key: "wrong_cover" },
+          { label: "Wrong Meta", key: "wrong_meta" },
+          { label: "Improper Scanning", key: "improper_scan" },
+          { label: "Full Scanning", key: "full_scan" },
+          { label: "Wrong Page Count", key: "wrong_page_count" },
+          { label: "Corrupt File", key: "corrupt_file" },
+        ].map(({ label, key }) => (
+          <div key={key} className="border p-2 flex gap-2 items-center">
+            <p className="text-sm">{label}</p>
+            <div className="grow"></div>
+            <Switch
+              checked={problem[key as keyof Problems]}
+              onChange={(checked) =>
+                setProblem((prev) => ({ ...prev, [key]: checked }))
+              }
+              size="small"
+            />
+          </div>
+        ))}
       </div>
       <div className="w-full flex items-center mt-2">
         <div className="grow"></div>
-        <Button type="primary" size="small">
+        <Button type="primary" size="small" onClick={onsubmit}>
           complete
         </Button>
       </div>

@@ -8,6 +8,7 @@ interface SubmitQcFilePayload {
   full_rescan: boolean;
   wrong_page_count: boolean;
   corrupt_file: boolean;
+  wrong_cover: boolean;
   created_by: number;
 }
 
@@ -46,6 +47,7 @@ const SubmitQcFile = async (
         wrong_file_id: payload.wrong_file_id,
         wrong_page_count: payload.wrong_file_id,
         fileId: is_exist.id,
+        wrong_cover: payload.wrong_cover,
         status: "PENDING",
       },
     });
@@ -69,7 +71,7 @@ const SubmitQcFile = async (
         id: payload.id,
       },
       data: {
-        meta_end: new Date(),
+        qc_end: new Date(),
       },
     });
 
