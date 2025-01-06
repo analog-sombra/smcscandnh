@@ -14,6 +14,7 @@ const GetScanFile = async (
   const functionname: string = GetScanFile.name;
 
   try {
+    // order first is_scan true and then order by mod_start desc
     const file_response = await prisma.file_base.findMany({
       where: {
         scanid: payload.userid,
@@ -22,6 +23,14 @@ const GetScanFile = async (
         is_mod: true,
         is_sup: true,
       },
+      orderBy: [
+        {
+          scan_start: "desc",
+        },
+        {
+          mod_start: "desc",
+        },
+      ],
     });
 
     if (!file_response) {

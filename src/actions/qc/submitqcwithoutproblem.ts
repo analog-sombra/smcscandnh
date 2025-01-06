@@ -1,14 +1,6 @@
 "use server";
-interface SubmitQcFilePayload {
+interface SubmitQcFileWithoutProblemPayload {
   id: number;
-  remark: string;
-  wrong_file_id: boolean;
-  meta_improper: boolean;
-  improper_scan: boolean;
-  full_rescan: boolean;
-  wrong_page_count: boolean;
-  corrupt_file: boolean;
-  wrong_cover: boolean;
   created_by: number;
 }
 
@@ -17,10 +9,10 @@ import { file } from "@prisma/client";
 import prisma from "../../../prisma/database";
 import { ApiResponseType, createResponse } from "@/models/response";
 
-const SubmitQcFile = async (
-  payload: SubmitQcFilePayload
+const SubmitQcFileWithoutProblem = async (
+  payload: SubmitQcFileWithoutProblemPayload
 ): Promise<ApiResponseType<file | null>> => {
-  const functionname: string = SubmitQcFile.name;
+  const functionname: string = SubmitQcFileWithoutProblem.name;
 
   try {
     const is_exist = await prisma.file.findFirst({
@@ -34,28 +26,6 @@ const SubmitQcFile = async (
       return createResponse({
         functionname: functionname,
         message: "File not found",
-      });
-    }
-
-    const file_response = await prisma.problem_file.create({
-      data: {
-        remarks: payload.remark,
-        corrupt_file: payload.corrupt_file,
-        full_rescan: payload.full_rescan,
-        improper_scan: payload.improper_scan,
-        meta_improper: payload.meta_improper,
-        wrong_file_id: payload.wrong_file_id,
-        wrong_page_count: payload.wrong_file_id,
-        fileId: is_exist.id,
-        wrong_cover: payload.wrong_cover,
-        status: "PENDING",
-      },
-    });
-
-    if (!file_response) {
-      return createResponse({
-        functionname: functionname,
-        message: "File problem not updated",
       });
     }
 
@@ -89,4 +59,4 @@ const SubmitQcFile = async (
   }
 };
 
-export default SubmitQcFile;
+export default SubmitQcFileWithoutProblem;

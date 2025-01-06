@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import GetScanerCount from "@/actions/scaner/getscanercount";
 import GetScanFile from "@/actions/scaner/getscanfile";
 import ScaneerRequestFile from "@/actions/scaner/scanerreqfile";
 import SubmitScan from "@/actions/scaner/submitscan";
@@ -70,9 +71,25 @@ const ScannerPage = () => {
     setPopOpen(false);
   };
 
+  interface ResponseType {
+    filecount: number;
+    pagecount: number;
+  }
+
+  const [counts, setCounts] = useState<ResponseType>({
+    filecount: 0,
+    pagecount: 0,
+  });
+
   const [files, setFiles] = useState<file_base[]>([]);
 
   const init = async () => {
+    const response = await GetScanerCount({
+      userid: userid,
+    });
+    if (response.data && response.status) {
+      setCounts(response.data);
+    }
     const get_file_response = await GetScanFile({
       userid: userid,
     });
@@ -82,6 +99,7 @@ const ScannerPage = () => {
     } else {
       toast.error(get_file_response.message);
     }
+    resetInput();
   };
 
   useEffect(() => {
@@ -96,6 +114,13 @@ const ScannerPage = () => {
 
     const init = async () => {
       setLoading(true);
+
+      const response = await GetScanerCount({
+        userid: parseInt(id),
+      });
+      if (response.data && response.status) {
+        setCounts(response.data);
+      }
       const get_file_response = await GetScanFile({
         userid: parseInt(id),
       });
@@ -106,6 +131,7 @@ const ScannerPage = () => {
         toast.error(get_file_response.message);
       }
       setLoading(false);
+      resetInput();
     };
 
     init();
@@ -127,6 +153,10 @@ const ScannerPage = () => {
         [size]: value,
       },
     }));
+  };
+
+  const resetInput = () => {
+    setPageSizes({});
   };
 
   const submitfile = async (id: number) => {
@@ -153,6 +183,39 @@ const ScannerPage = () => {
     await init();
   };
 
+  // search start form here
+  const searchRef = useRef<InputRef>(null);
+  const [issearch, setIssearch] = useState(false);
+  const [searchfiles, setSearchFiles] = useState<file_base[]>([]);
+
+  const searchfile = async () => {
+    if (
+      searchRef.current == null ||
+      searchRef.current.input == null ||
+      searchRef.current.input.value == ""
+    ) {
+      return toast.error("Please enter file id");
+    }
+
+    const fileid = searchRef.current.input.value;
+
+    const search_response = files.filter((file) => file.fileid == fileid);
+
+    if (search_response.length == 0) {
+      return toast.error("No file found");
+    }
+
+    setSearchFiles(search_response);
+    setIssearch(true);
+  };
+
+  const resetSearch = () => {
+    setIssearch(false);
+    setSearchFiles([]);
+  };
+
+  // search end here
+
   if (loading) {
     return (
       <div className="grid place-items-center h-screen w-full font-semibold text-3xl">
@@ -166,11 +229,11 @@ const ScannerPage = () => {
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-3 gap-2 items-center mt-2">
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays File Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.filecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays Page Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.pagecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Pending File Count</p>
@@ -179,7 +242,9 @@ const ScannerPage = () => {
       </div>
 
       <div className="w-full md:mx-auto md:w-4/6 mt-2 flex items-center gap-2">
-        <p className="text-lg md:text-2xl">Your Running Files</p>
+        <p className="text-lg md:text-2xl">
+          Your Running Files {issearch ? searchfiles.length : null}
+        </p>
         <div className="grow"></div>
         <Popover
           open={popOpen}
@@ -204,9 +269,17 @@ const ScannerPage = () => {
         </Popover>
         <Search
           className="w-40"
-          placeholder="input search text"
+          placeholder="Enter File ID"
           loading={false}
+          ref={searchRef}
+          onSearch={searchfile}
+          disabled={issearch}
         />
+        {issearch && (
+          <Button type="primary" onClick={resetSearch}>
+            Reset Search
+          </Button>
+        )}
       </div>
       <div className="w-full md:mx-auto md:w-4/6  p-2 bg-white border rounded mt-2">
         <div className="overflow-x-auto">
@@ -220,51 +293,102 @@ const ScannerPage = () => {
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {files.map((file: file_base, index: number) => (
-                <tr key={index} className="border-y py-2">
-                  <td className="text-center py-2 w-20">{file.fileid}</td>
-                  <td className="text-center px-1 md:px-4">
-                    <Input
-                      placeholder="Enter Small Size"
-                      value={pageSizes[file.id]?.small || ""}
-                      onChange={(e) =>
-                        handleInputChange(file.id, "small", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="text-center px-1 md:px-4">
-                    <Input
-                      placeholder="Enter Med Size"
-                      value={pageSizes[file.id]?.medium || ""}
-                      onChange={(e) =>
-                        handleInputChange(file.id, "medium", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="text-center px-1 md:px-4">
-                    <Input
-                      placeholder="Enter Large Size"
-                      value={pageSizes[file.id]?.large || ""}
-                      onChange={(e) =>
-                        handleInputChange(file.id, "large", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="text-center">
-                    {file.is_scan && (
-                      <Button
-                        type="primary"
-                        size="small"
-                        onClick={() => submitfile(file.id)}
-                      >
-                        complete
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+
+            {issearch ? (
+              <>
+                <tbody>
+                  {searchfiles.map((file: file_base, index: number) => (
+                    <tr key={index} className="border-y py-2">
+                      <td className="text-center py-2 w-20">{file.fileid}</td>
+                      <td className="text-center px-1 md:px-4">
+                        <Input
+                          placeholder="Enter Small Size"
+                          value={pageSizes[file.id]?.small || ""}
+                          onChange={(e) =>
+                            handleInputChange(file.id, "small", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td className="text-center px-1 md:px-4">
+                        <Input
+                          placeholder="Enter Med Size"
+                          value={pageSizes[file.id]?.medium || ""}
+                          onChange={(e) =>
+                            handleInputChange(file.id, "medium", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td className="text-center px-1 md:px-4">
+                        <Input
+                          placeholder="Enter Large Size"
+                          value={pageSizes[file.id]?.large || ""}
+                          onChange={(e) =>
+                            handleInputChange(file.id, "large", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td className="text-center">
+                        {file.is_scan && (
+                          <Button
+                            type="primary"
+                            size="small"
+                            onClick={() => submitfile(file.id)}
+                          >
+                            complete
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </>
+            ) : (
+              <tbody>
+                {files.map((file: file_base, index: number) => (
+                  <tr key={index} className="border-y py-2">
+                    <td className="text-center py-2 w-20">{file.fileid}</td>
+                    <td className="text-center px-1 md:px-4">
+                      <Input
+                        placeholder="Enter Small Size"
+                        value={pageSizes[file.id]?.small || ""}
+                        onChange={(e) =>
+                          handleInputChange(file.id, "small", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="text-center px-1 md:px-4">
+                      <Input
+                        placeholder="Enter Med Size"
+                        value={pageSizes[file.id]?.medium || ""}
+                        onChange={(e) =>
+                          handleInputChange(file.id, "medium", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="text-center px-1 md:px-4">
+                      <Input
+                        placeholder="Enter Large Size"
+                        value={pageSizes[file.id]?.large || ""}
+                        onChange={(e) =>
+                          handleInputChange(file.id, "large", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="text-center">
+                      {file.is_scan && (
+                        <Button
+                          type="primary"
+                          size="small"
+                          onClick={() => submitfile(file.id)}
+                        >
+                          complete
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
       </div>

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
+import GetMetaCount from "@/actions/meta/getmetacount";
 import GetMetaFile from "@/actions/meta/getmetafile";
 import MetaRequestFile from "@/actions/meta/metareqfile";
 import { encryptURLData } from "@/utils/methods";
@@ -65,7 +66,24 @@ const QcPage = () => {
     setPopOpen(false);
   };
 
+  interface ResponseType {
+    filecount: number;
+    pagecount: number;
+  }
+
+  const [counts, setCounts] = useState<ResponseType>({
+    filecount: 0,
+    pagecount: 0,
+  });
+
   const init = async () => {
+    const response = await GetMetaCount({
+      userid: userid,
+    });
+    if (response.data && response.status) {
+      setCounts(response.data);
+    }
+
     const get_file_response = await GetMetaFile({
       userid: userid,
     });
@@ -88,6 +106,13 @@ const QcPage = () => {
 
     const init = async () => {
       setLoading(true);
+      const response = await GetMetaCount({
+        userid: parseInt(id),
+      });
+      if (response.data && response.status) {
+        setCounts(response.data);
+      }
+
       const get_file_response = await GetMetaFile({
         userid: parseInt(id),
       });
@@ -116,11 +141,11 @@ const QcPage = () => {
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-3 gap-2 items-center mt-2">
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays File Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.filecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays Page Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.pagecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Pending File Count</p>

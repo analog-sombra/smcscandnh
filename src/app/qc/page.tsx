@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
+import GetQcCount from "@/actions/qc/getqccount";
 import GetQcFile from "@/actions/qc/getqcfile";
 import QcRequestFile from "@/actions/qc/qcreqfile";
 import { encryptURLData } from "@/utils/methods";
@@ -12,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
-const { Search } = Input;
+// const { Search } = Input;
 
 const QcPage = () => {
   const router = useRouter();
@@ -64,6 +65,16 @@ const QcPage = () => {
     setPopOpen(false);
   };
 
+  interface ResponseType {
+    filecount: number;
+    pagecount: number;
+  }
+
+  const [counts, setCounts] = useState<ResponseType>({
+    filecount: 0,
+    pagecount: 0,
+  });
+
   const init = async () => {
     const get_file_response = await GetQcFile({
       userid: userid,
@@ -71,8 +82,13 @@ const QcPage = () => {
 
     if (get_file_response.data && get_file_response.status) {
       setFiles(get_file_response.data);
-    } else {
-      toast.error(get_file_response.message);
+    }
+
+    const response = await GetQcCount({
+      userid: userid,
+    });
+    if (response.data && response.status) {
+      setCounts(response.data);
     }
   };
 
@@ -87,6 +103,14 @@ const QcPage = () => {
 
     const init = async () => {
       setLoading(true);
+
+      const response = await GetQcCount({
+        userid: parseInt(id),
+      });
+      if (response.data && response.status) {
+        setCounts(response.data);
+      }
+
       const get_file_response = await GetQcFile({
         userid: parseInt(id),
       });
@@ -115,11 +139,11 @@ const QcPage = () => {
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-3 gap-2 items-center mt-2">
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays File Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.filecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Todays Page Count</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-xl">{counts.pagecount}</p>
         </div>
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Pending File Count</p>
@@ -151,11 +175,11 @@ const QcPage = () => {
             Request File
           </Button>
         </Popover>
-        <Search
+        {/* <Search
           className="w-40"
           placeholder="input search text"
           loading={false}
-        />
+        /> */}
       </div>
       <div className="w-full md:mx-auto md:w-4/6 mt-2 grid grid-cols-8 items-center  gap-2">
         {files.map((file, index: number) => (

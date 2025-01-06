@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import GetfileById from "@/actions/file/getfilebyid";
 import SubmitQcFile from "@/actions/qc/submitqc";
+import SubmitQcFileWithoutProblem from "@/actions/qc/submitqcwithoutproblem";
 import { decryptURLData } from "@/utils/methods";
 import { file, file_type, village } from "@prisma/client";
 import { Button, Divider, Switch, Input } from "antd";
@@ -61,7 +62,7 @@ const QcFilePage = () => {
     wrong_page_count: false,
   });
 
-  const onsubmit = async () => {
+  const onsubmitwithproblme = async () => {
     const id = getCookie("id");
 
     if (id == null) {
@@ -71,6 +72,16 @@ const QcFilePage = () => {
 
     if (remark == null || remark == undefined || remark == "") {
       return toast.error("Enter remark");
+    }
+    if (
+      problem.wrong_page_count == false &&
+      problem.corrupt_file == false &&
+      problem.full_scan == false &&
+      problem.improper_scan == false &&
+      problem.wrong_meta == false &&
+      problem.wrong_cover == false
+    ) {
+      return toast.error("Select any problem");
     }
 
     const response = await SubmitQcFile({
@@ -92,6 +103,41 @@ const QcFilePage = () => {
       return toast.error(response.message);
     }
   };
+
+  const onsubmitwithoutproblme = async () => {
+    const id = getCookie("id");
+
+    if (id == null) {
+      toast.error("User not found");
+      return router.push("/login");
+    }
+
+    if (remark!.length > 0) {
+      return toast.error("Remove the remark first then submit");
+    }
+
+    if (
+      problem.wrong_page_count == true ||
+      problem.corrupt_file == true ||
+      problem.full_scan == true ||
+      problem.improper_scan == true ||
+      problem.wrong_meta == true ||
+      problem.wrong_cover == true
+    ) {
+      return toast.error("Note: Clear the problem first then submit");
+    }
+    const response = await SubmitQcFileWithoutProblem({
+      id: fileid,
+      created_by: parseInt(id),
+    });
+    if (response.data && response.status) {
+      toast.success(response.message);
+      router.back();
+    } else {
+      return toast.error(response.message);
+    }
+  };
+
 
   if (isLoading)
     return (
@@ -167,9 +213,22 @@ const QcFilePage = () => {
         ))}
       </div>
       <div className="w-full flex items-center mt-2">
+        <Button
+          type="primary"
+          size="small"
+          className="bg-green-500"
+          onClick={onsubmitwithoutproblme}
+        >
+          complete without problem
+        </Button>
         <div className="grow"></div>
-        <Button type="primary" size="small" onClick={onsubmit}>
-          complete
+        <Button
+          type="primary"
+          size="small"
+          onClick={onsubmitwithproblme}
+          className="bg-rose-500"
+        >
+          complete with problem
         </Button>
       </div>
     </div>

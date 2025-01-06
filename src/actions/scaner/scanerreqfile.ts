@@ -33,6 +33,23 @@ const ScaneerRequestFile = async (
       },
     });
 
+    const count_response = await prisma.file_base.count({
+      where: {
+        scanid: payload.created_by,
+        scan_end: null,
+        status: "ACTIVE",
+        is_mod: true,
+        is_sup: true,
+      },
+    });
+
+    if (count_response > 5) {
+      return createResponse({
+        message: "You can't request files.",
+        functionname: functionname,
+      });
+    }
+
     if (file_response.length < payload.count) {
       return createResponse({
         message:

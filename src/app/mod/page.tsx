@@ -41,6 +41,13 @@ const ScannerPage = () => {
     setTakeBool([]);
   };
 
+  interface ModFileRequestResponse {
+    count: number;
+    files: file_base[];
+    date: Date;
+    name: string;
+  }
+
   const [files, setFiles] = useState<ModFileRequestResponse[]>([]);
 
   useEffect(() => {
@@ -172,12 +179,6 @@ const ScannerPage = () => {
   };
 
   // give section  end here
-  interface ModFileRequestResponse {
-    count: number;
-    files: file_base[];
-    date: Date;
-    name: string;
-  }
 
   const [index, setIndex] = useState(0);
 
@@ -199,21 +200,24 @@ const ScannerPage = () => {
           </Button>
         </div>
         <div className="overflow-y-auto h-[86vh] mt-1">
-          {files[index].files.map((file, index) => {
-            if (file.scan_end == null) return;
-            return (
-              <div
-                key={index}
-                className="flex border p-1 items-center justify-between"
-              >
-                <p className="text-lg">{file.fileid}</p>
-                <Switch
-                  checked={takeBool[index] || false}
-                  onChange={(checked) => handleTakeSwitchChange(index, checked)}
-                />
-              </div>
-            );
-          })}
+          {files.length > 0 &&
+            files[index].files.map((file, index) => {
+              if (file.scan_end == null) return;
+              return (
+                <div
+                  key={index}
+                  className="flex border p-1 items-center justify-between"
+                >
+                  <p className="text-lg">{file.fileid}</p>
+                  <Switch
+                    checked={takeBool[index] || false}
+                    onChange={(checked) =>
+                      handleTakeSwitchChange(index, checked)
+                    }
+                  />
+                </div>
+              );
+            })}
         </div>
       </Drawer>
       <Drawer closeIcon={null} onClose={closeGive} open={giveBox}>
@@ -224,21 +228,24 @@ const ScannerPage = () => {
           </Button>
         </div>
         <div className="overflow-y-auto h-[86vh] mt-1">
-          {files[index].files.map((file, index) => {
-            if (file.is_scan) return;
-            return (
-              <div
-                key={index}
-                className="flex border p-1 items-center justify-between"
-              >
-                <p className="text-lg">{file.fileid}</p>
-                <Switch
-                  checked={giveBool[index] || false}
-                  onChange={(checked) => handleGiveSwitchChange(index, checked)}
-                />
-              </div>
-            );
-          })}
+          {files.length > 0 &&
+            files[index].files.map((file, index) => {
+              if (file.is_scan) return;
+              return (
+                <div
+                  key={index}
+                  className="flex border p-1 items-center justify-between"
+                >
+                  <p className="text-lg">{file.fileid}</p>
+                  <Switch
+                    checked={giveBool[index] || false}
+                    onChange={(checked) =>
+                      handleGiveSwitchChange(index, checked)
+                    }
+                  />
+                </div>
+              );
+            })}
         </div>
       </Drawer>
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-3 gap-2 items-center mt-2">
