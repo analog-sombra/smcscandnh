@@ -2,6 +2,7 @@
 interface CollectFilePayload {
   count: number;
   created_by: number;
+  deptid: number;
 }
 
 import { errorToString } from "@/utils/methods";
@@ -87,6 +88,7 @@ const CollectFile = async (
         createdById: payload.created_by,
         updatedAt: new Date(),
         status: Status.ACTIVE,
+        departmentId: payload.deptid,
         filebaseId: fileBase.id, // Link to the `file_base` record
       })),
     });

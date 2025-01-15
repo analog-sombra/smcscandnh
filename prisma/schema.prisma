@@ -27,6 +27,17 @@ enum Role {
     SUPERVISOR
 }
 
+enum File_Color {
+    DARK_BLUE
+    YELLOW
+    GREEN
+    RED
+    PINK
+    LIGHT_BLUE
+    ORANGE
+    BROWN
+}
+
 model user {
     id          Int         @id @default(autoincrement())
     username    String      @unique
@@ -100,36 +111,58 @@ model file_base {
 }
 
 model file {
-    id                       Int                     @id @default(autoincrement())
-    filebase                 file_base?              @relation(fields: [filebaseId], references: [id])
-    filebaseId               Int?
-    fileid                   String                  @unique
-    file_no                  String?
-    fts_no                   String?
-    filename                 String?
-    file_type                file_type?              @relation(fields: [file_typeId], references: [id])
-    file_typeId              Int?
-    physical_file_location   physical_file_location? @relation(fields: [physical_file_locationId], references: [id])
-    physical_file_locationId Int?
-    village                  village?                @relation(fields: [villageId], references: [id])
-    villageId                Int?
+    id Int @id @default(autoincrement())
+
+    filebase     file_base? @relation(fields: [filebaseId], references: [id])
+    filebaseId   Int?
+    department   department @relation(fields: [departmentId], references: [id])
+    departmentId Int
+    file_type    file_type? @relation(fields: [file_typeId], references: [id])
+    file_typeId  Int?
+
+    fileid             String      @unique // our file id
+    file_no            String? // departmen file id 
+    file_ref_no        String? // file reference no
+    fts_no             String?
+    filename           String? // applicant name
+    survey_no          String?
+    plot_no            String?
+    order_no           String?
+    order_date         DateTime?
+    complaint_no       String?
+    complaint_date     DateTime?
+    issue_date         DateTime?
+    subject            String?
+    book_no            String? // measurment book no
+    file_color         File_Color?
+    agreement_no       String?
+    tender_agency_name String?
+    n_no_end           String? // noting no end
+    c_no_end           String? // correspondence no end
+
+    village   village? @relation(fields: [villageId], references: [id])
+    villageId Int?
+    year      String?
+
     small_page_count         String?
     mid_page_count           String?
     large_page_count         String?
-    year                     String?
-    status                   Status                  @default(ACTIVE)
-    createdAt                DateTime                @default(now())
-    createdBy                user?                   @relation("created_by_file", fields: [createdById], references: [id])
-    createdById              Int?
-    updatedAt                DateTime                @updatedAt
-    updatedBy                user?                   @relation("updated_by_file", fields: [updatedById], references: [id])
-    updatedById              Int?
-    deletedAt                DateTime?
-    deletedBy                user?                   @relation("deleted_by_file", fields: [deletedById], references: [id])
-    deletedById              Int?
-    file_name                file_name[]
-    file_survey              file_survey[]
-    problem_file             problem_file[]
+    physical_file_location   physical_file_location? @relation(fields: [physical_file_locationId], references: [id])
+    physical_file_locationId Int?
+
+    status       Status         @default(ACTIVE)
+    createdAt    DateTime       @default(now())
+    createdBy    user?          @relation("created_by_file", fields: [createdById], references: [id])
+    createdById  Int?
+    updatedAt    DateTime       @updatedAt
+    updatedBy    user?          @relation("updated_by_file", fields: [updatedById], references: [id])
+    updatedById  Int?
+    deletedAt    DateTime?
+    deletedBy    user?          @relation("deleted_by_file", fields: [deletedById], references: [id])
+    deletedById  Int?
+    file_name    file_name[]
+    file_survey  file_survey[]
+    problem_file problem_file[]
 }
 
 model village {
@@ -214,4 +247,16 @@ model problem_file {
     status           ProblemStatus @default(PENDING)
     createdAt        DateTime      @default(now())
     updatedAt        DateTime      @updatedAt
+}
+
+model department {
+    id        Int       @id @default(autoincrement())
+    name      String
+    wing      String?
+    remark    String?
+    status    Status    @default(ACTIVE)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+    file      file[]
 }

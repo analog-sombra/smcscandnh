@@ -40,11 +40,11 @@ const onlyNumbersRegex = /^[0-9]*$/;
  * @returns None
  */
 const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const { value } = event.target;
-
+  const inputElement = event.target;
+  const { value } = inputElement;
+  console.log(inputElement);
   if (!onlyNumbersRegex.test(value)) {
-    console.log(value);
-    event.target.value = event.target.value.slice(0, -1);
+    inputElement.value = value.slice(0, -1); // Remove the last character
   }
 };
 

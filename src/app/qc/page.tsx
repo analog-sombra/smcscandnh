@@ -5,12 +5,12 @@ import GetQcFile from "@/actions/qc/getqcfile";
 import QcRequestFile from "@/actions/qc/qcreqfile";
 import { encryptURLData } from "@/utils/methods";
 import { file_base } from "@prisma/client";
-import { Button, InputRef, Popover } from "antd";
+import { Button, Popover } from "antd";
 import { Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // const { Search } = Input;
@@ -23,7 +23,7 @@ const QcPage = () => {
   const [files, setFiles] = useState<file_base[]>([]);
 
   const [popOpen, setPopOpen] = useState(false);
-  const countRef = useRef<InputRef>(null);
+  const [count, setCount] = useState<number | undefined>(undefined);
 
   const requestfile = async () => {
     const id = getCookie("id");
@@ -33,19 +33,9 @@ const QcPage = () => {
       return router.push("/login");
     }
 
-    if (
-      countRef.current == null ||
-      countRef.current.input == null ||
-      countRef.current.input.value == ""
-    ) {
+    if (count == 0 || count == null || count == undefined) {
       return toast.error("Please enter count");
     }
-
-    if (isNaN(parseInt(countRef.current.input.value))) {
-      return toast.error("Please enter valid count");
-    }
-
-    const count = parseInt(countRef.current.input.value);
 
     if (count >= 26) {
       return toast.error("Count should be less than 25.");
@@ -126,6 +116,20 @@ const QcPage = () => {
     init();
   }, []);
 
+  const handleNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setCount: Dispatch<SetStateAction<number | undefined>>
+  ) => {
+    const onlyNumbersRegex = /^[0-9]*$/;
+    const { value } = event.target;
+
+    if (onlyNumbersRegex.test(value)) {
+      // Parse value and handle empty case
+      const adddata = value === "" ? undefined : parseInt(value, 10);
+      setCount(adddata);
+    }
+  };
+
   if (loading) {
     return (
       <div className="grid place-items-center h-screen w-full font-semibold text-3xl">
@@ -160,7 +164,8 @@ const QcPage = () => {
           content={
             <div className="flex flex-col gap-1">
               <Input
-                ref={countRef}
+                value={count === undefined ? "" : count.toString()} // Controlled input
+                onChange={(e) => handleNumberChange(e, setCount)}
                 placeholder="Enter Count"
                 className="w-full"
               />

@@ -1,21 +1,25 @@
 "use client";
+import GetAllDepartment from "@/actions/department/getalldept";
 import CollectFile from "@/actions/supervisor/collectfile";
 import GetSupervisorCount from "@/actions/supervisor/getcounts";
 import GetSupervisorFiles from "@/actions/supervisor/getsupervisorfiles";
 import GetUserFileData from "@/actions/supervisor/getuserfiledata";
-import { formateDate, handleNumberChange } from "@/utils/methods";
-import { file_base, user } from "@prisma/client";
-import { Button, Divider, Drawer, InputRef, Popover } from "antd";
+import { formateDate } from "@/utils/methods";
+import { department, file_base, user } from "@prisma/client";
+import { Button, Divider, Drawer, Popover, Select } from "antd";
 import { Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const QcPage = () => {
   const router = useRouter();
 
-  const countRef = useRef<InputRef>(null);
+  // const countRef = useRef<InputRef>(null);
+
+  const [count, setCount] = useState<number | undefined>(undefined);
+  const [deptTypes, setDeptTypes] = useState<department[]>([]);
 
   const collectfile = async () => {
     const id = getCookie("id");
@@ -25,23 +29,18 @@ const QcPage = () => {
       return router.push("/login");
     }
 
-    if (
-      countRef.current == null ||
-      countRef.current.input == null ||
-      countRef.current.input.value == ""
-    ) {
+    if (count == 0 || count == null || count == undefined) {
       return toast.error("Please enter count");
     }
 
-    if (isNaN(parseInt(countRef.current.input.value))) {
-      return toast.error("Please enter valid count");
+    if (depttypeid == 0) {
+      return toast.error("Please select department");
     }
-
-    const count = parseInt(countRef.current.input.value);
 
     const collect_file_response = await CollectFile({
       count,
       created_by: parseInt(id),
+      deptid: depttypeid,
     });
 
     if (collect_file_response.data && collect_file_response.status) {
@@ -131,6 +130,10 @@ const QcPage = () => {
       if (user_response.data && user_response.status) {
         setUserFiles(user_response.data);
       }
+      const dept_response = await GetAllDepartment();
+      if (dept_response.data && dept_response.status) {
+        setDeptTypes(dept_response.data);
+      }
     };
     init();
   }, []);
@@ -145,6 +148,25 @@ const QcPage = () => {
     "Total",
     "Smart Total",
   ];
+
+  const handleNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setCount: Dispatch<SetStateAction<number | undefined>>
+  ) => {
+    const onlyNumbersRegex = /^[0-9]*$/;
+    const { value } = event.target;
+
+    if (onlyNumbersRegex.test(value)) {
+      // Parse value and handle empty case
+      const adddata = value === "" ? undefined : parseInt(value, 10);
+      setCount(adddata);
+    }
+  };
+
+  const [depttypeid, setDepttypeid] = useState<number>(0);
+  const [depttypeName, setDepttypeName] = useState<string | undefined>(
+    undefined
+  );
 
   return (
     <>
@@ -190,10 +212,33 @@ const QcPage = () => {
           content={
             <div className="flex flex-col gap-1">
               <Input
-                ref={countRef}
                 placeholder="Enter Count"
                 className="w-full"
-                onChange={handleNumberChange}
+                value={count === undefined ? "" : count.toString()} // Controlled input
+                onChange={(e) => handleNumberChange(e, setCount)}
+              />
+              <Select
+                showSearch={true}
+                className="w-60"
+                onChange={(value) => {
+                  setDepttypeid(parseInt(value.toString()));
+                  const fileType = deptTypes.find(
+                    (files) => files.id === parseInt(value.toString())
+                  );
+                  if (!fileType) return;
+                  setDepttypeName(fileType.name);
+                }}
+                value={depttypeName ?? undefined}
+                placeholder="Enter File Type"
+                options={deptTypes.map((files) => ({
+                  value: files.id.toString(),
+                  label: files.name,
+                }))}
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               />
               <Button type="primary" size="small" onClick={collectfile}>
                 Request
@@ -203,11 +248,14 @@ const QcPage = () => {
           title="Collect File From Department"
         >
           <Button type="primary" onClick={() => setPopOpen(true)}>
-            Collect File
+            Collect File Dept
           </Button>
         </Popover>
         <Button type="primary" onClick={() => setOpen(true)}>
           Daily File
+        </Button>
+        <Button type="primary" onClick={() => setPopOpen(true)}>
+          Collect File Staff
         </Button>
       </div>
 
