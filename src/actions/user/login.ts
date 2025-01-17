@@ -40,6 +40,7 @@ const login = async (
     const cookieStore = await cookies();
     cookieStore.set("id", user.id.toString());
     cookieStore.set("role", user.role.toString());
+    cookieStore.set("username", user.username.toString());
 
     return createResponse({
       message: "Invalid Credentials. Please try again.",

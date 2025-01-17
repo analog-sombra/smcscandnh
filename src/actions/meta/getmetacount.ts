@@ -51,7 +51,7 @@ const GetMetaCount = async (
 
     if (!file_count) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }

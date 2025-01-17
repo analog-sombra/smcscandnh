@@ -53,7 +53,7 @@ const GetUserFileData = async (): Promise<
 
     if (!qcfile) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -122,7 +122,7 @@ const GetUserFileData = async (): Promise<
 
     if (!metafile) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -188,7 +188,7 @@ const GetUserFileData = async (): Promise<
 
     if (!scanfile) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }

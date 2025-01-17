@@ -33,7 +33,7 @@ const GetSupervisorFiles = async (): Promise<
 
     if (!qcfiles) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -53,7 +53,7 @@ const GetSupervisorFiles = async (): Promise<
 
     if (!metafiles) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -73,7 +73,7 @@ const GetSupervisorFiles = async (): Promise<
 
     if (!scanfiles) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -108,7 +108,7 @@ const GetSupervisorFiles = async (): Promise<
 
     if (!modfiles) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }

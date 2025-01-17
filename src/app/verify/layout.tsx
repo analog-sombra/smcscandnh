@@ -65,7 +65,7 @@ export default function RootLayout({
         <div className="w-full md:mx-auto md:w-4/6 flex p-2 bg-white border gap-4 items-center rounded">
           <FluentPerson20Filled className="text-3xl text-gray-400" />
 
-          <p>User name (VERIFY)</p>
+          <p>{getCookie("username")} (VERIFY)</p>
           <div className="grow"></div>
           <Button size="small" type="primary" danger onClick={logout}>
             Logout

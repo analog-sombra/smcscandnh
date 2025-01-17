@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import GetModCount from "@/actions/mod/getmodcount";
 import GetModRequest from "@/actions/mod/getmodrequest";
 import ModGiveFiles from "@/actions/mod/givefiles";
 import ModTakeFiles from "@/actions/mod/takefiles";
@@ -17,17 +18,36 @@ const { Search } = Input;
 const ScannerPage = () => {
   const router = useRouter();
 
+  interface ResponseType {
+    in_scan: number;
+    pending_take: number;
+    pending_give: number;
+  }
+
+  const [counts, setCounts] = useState<ResponseType>({
+    in_scan: 0,
+    pending_take: 0,
+    pending_give: 0,
+  });
+
   const [loading, setLoading] = useState(true);
   const [userid, setUserid] = useState<number>(0);
 
   const columns: string[] = [
     "Scanner Name",
     "Date",
-    "Number of file requested",
+    "File Requested/Given/Taken",
     "Action",
   ];
 
   const init = async () => {
+    const response = await GetModCount({
+      userid: userid,
+    });
+    if (response.data && response.status) {
+      setCounts(response.data);
+    }
+
     const get_file_response = await GetModRequest({
       userid: userid,
     });
@@ -46,6 +66,8 @@ const ScannerPage = () => {
     files: file_base[];
     date: Date;
     name: string;
+    given: number;
+    taken: number;
   }
 
   const [files, setFiles] = useState<ModFileRequestResponse[]>([]);
@@ -61,6 +83,15 @@ const ScannerPage = () => {
 
     const init = async () => {
       setLoading(true);
+
+      const response = await GetModCount({
+        userid: parseInt(id),
+      });
+      console.log(response);
+      if (response.data && response.status) {
+        setCounts(response.data);
+      }
+
       const get_file_response = await GetModRequest({
         userid: parseInt(id),
       });
@@ -145,9 +176,11 @@ const ScannerPage = () => {
     });
     setGiveBox(true);
   };
+
   const closeGive = () => {
     setGiveBox(false);
   };
+
   const handleGiveSwitchChange = (switchIndex: number, checked: boolean) => {
     setGiveBool((prev) => {
       const updatedGiveBool = [...prev];
@@ -201,23 +234,24 @@ const ScannerPage = () => {
         </div>
         <div className="overflow-y-auto h-[86vh] mt-1">
           {files.length > 0 &&
-            files[index].files.map((file, index) => {
-              if (file.scan_end == null) return;
-              return (
-                <div
-                  key={index}
-                  className="flex border p-1 items-center justify-between"
-                >
-                  <p className="text-lg">{file.fileid}</p>
-                  <Switch
-                    checked={takeBool[index] || false}
-                    onChange={(checked) =>
-                      handleTakeSwitchChange(index, checked)
-                    }
-                  />
-                </div>
-              );
-            })}
+            files[index].files
+              .filter((val) => val.scan_end != null && val.mod_end == null)
+              .map((file, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex border p-1 items-center justify-between"
+                  >
+                    <p className="text-lg">{file.fileid}</p>
+                    <Switch
+                      checked={takeBool[index] || false}
+                      onChange={(checked) =>
+                        handleTakeSwitchChange(index, checked)
+                      }
+                    />
+                  </div>
+                );
+              })}
         </div>
       </Drawer>
       <Drawer closeIcon={null} onClose={closeGive} open={giveBox}>
@@ -229,38 +263,40 @@ const ScannerPage = () => {
         </div>
         <div className="overflow-y-auto h-[86vh] mt-1">
           {files.length > 0 &&
-            files[index].files.map((file, index) => {
-              if (file.is_scan) return;
-              return (
-                <div
-                  key={index}
-                  className="flex border p-1 items-center justify-between"
-                >
-                  <p className="text-lg">{file.fileid}</p>
-                  <Switch
-                    checked={giveBool[index] || false}
-                    onChange={(checked) =>
-                      handleGiveSwitchChange(index, checked)
-                    }
-                  />
-                </div>
-              );
-            })}
+            files[index].files
+              .filter((val) => !val.is_scan)
+              .map((file, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex border p-1 items-center justify-between"
+                  >
+                    <p className="text-lg">{file.fileid}</p>
+                    <Switch
+                      checked={giveBool[index] || false}
+                      onChange={(checked) =>
+                        handleGiveSwitchChange(index, checked)
+                      }
+                    />
+                  </div>
+                );
+              })}
         </div>
       </Drawer>
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-3 gap-2 items-center mt-2">
         <div className="bg-white border  rounded p-2">
-          <p className="text-left text-sm">Start Id - End Id</p>
-          <p className="text-left text-xl">234</p>
+          <p className="text-left text-sm">Pending to give</p>
+          <p className="text-left text-xl">{counts.pending_give}</p>
         </div>
         <div className="bg-white border  rounded p-2">
-          <p className="text-left text-sm">Pending Request</p>
-          <p className="text-left text-xl">{files.length}</p>
+          <p className="text-left text-sm">Pending to take</p>
+          <p className="text-left text-xl">{counts.pending_take}</p>
         </div>
         <div className="bg-white border  rounded p-2">
-          <p className="text-left text-sm">Pending File Count</p>
+          <p className="text-left text-sm">In Scan</p>
           <p className="text-left text-xl">
-            {files.reduce((total, file) => total + file.count, 0)}
+            {counts.in_scan}
+            {/* {files.reduce((total, file) => total + file.count, 0)} */}
           </p>
         </div>
       </div>
@@ -298,22 +334,34 @@ const ScannerPage = () => {
                   <td className="text-center px-1 md:px-4 whitespace-nowrap">
                     {formateDate(file.date)}
                   </td>
-                  <td className="text-center px-1 md:px-4">{file.count}</td>
+                  <td className="text-center px-1 md:px-4">
+                    {file.count}/{file.given}/{file.taken}
+                  </td>
                   <td className="text-center grid grid-cols-2 py-2 gap-2">
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() => openGive(index)}
-                    >
-                      Give
-                    </Button>
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() => openTake(index)}
-                    >
-                      Take
-                    </Button>
+                    {/* if the count is 0 then dont show give and take button */}
+                    {files[index].files.filter((val) => !val.is_scan).length >
+                      0 && (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() => openGive(index)}
+                      >
+                        Give
+                      </Button>
+                    )}
+
+                    {files.length > 0 &&
+                      files[index].files.filter(
+                        (val) => val.scan_end != null && val.mod_end == null
+                      ).length > 0 && (
+                        <Button
+                          type="primary"
+                          size="small"
+                          onClick={() => openTake(index)}
+                        >
+                          Take
+                        </Button>
+                      )}
                   </td>
                 </tr>
               ))}

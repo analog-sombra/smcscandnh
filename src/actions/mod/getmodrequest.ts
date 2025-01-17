@@ -11,6 +11,8 @@ interface GetModRequestPayload {
 
 interface ModFileRequestResponse {
   count: number;
+  given: number;
+  taken: number;
   files: file_base[];
   date: Date;
   name: string;
@@ -25,7 +27,7 @@ const GetModRequest = async (
     const file_response = await prisma.file_base.findMany({
       where: {
         modid: payload.userid,
-        mod_end: null,
+        // mod_end: null,
         status: "ACTIVE",
         is_mod: true,
         is_sup: true,
@@ -54,6 +56,8 @@ const GetModRequest = async (
       if (!groupedByDate[dateKey]) {
         groupedByDate[dateKey] = {
           count: 0,
+          given: 0,
+          taken: 0,
           files: [],
           date: file.mod_start!,
           name: file.scan!.username || "unknown",
@@ -62,10 +66,16 @@ const GetModRequest = async (
 
       groupedByDate[dateKey].files.push(file);
       groupedByDate[dateKey].count += 1;
+
+      if (file.scan_start != null) {
+        groupedByDate[dateKey].given += 1;
+      }
+      if (file.mod_end != null) {
+        groupedByDate[dateKey].taken += 1;
+      }
     });
 
     const result: ModFileRequestResponse[] = Object.values(groupedByDate);
-
 
     return createResponse({
       message: "File found",

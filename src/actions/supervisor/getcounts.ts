@@ -51,7 +51,7 @@ const GetSupervisorCount = async (): Promise<
 
     if (!file_in_hand) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -70,7 +70,7 @@ const GetSupervisorCount = async (): Promise<
 
     if (!scancount) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -98,7 +98,7 @@ const GetSupervisorCount = async (): Promise<
     });
     if (!qccount) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
@@ -126,7 +126,7 @@ const GetSupervisorCount = async (): Promise<
     });
     if (!metacount) {
       return createResponse({
-        message: "Something want wrong",
+        message: "Something went wrong",
         functionname: functionname,
       });
     }
