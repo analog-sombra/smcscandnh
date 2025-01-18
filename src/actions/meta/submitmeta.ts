@@ -1,28 +1,28 @@
 "use server";
 interface SubmitMetaFilePayload {
   id: number;
-  villageId: number;
-  filetypeId: number;
   created_by: number;
-  file_color: string;
-  file_name: string;
-  applicant_name: string;
-  fts_no: string;
-  file_ref_no: string;
-  file_subject: string;
-  survery_no: string;
-  plot_no: string;
-  order_no: string;
-  order_date: string;
-  issue_date: string;
-  c_no_end: string;
-  n_no_end: string;
-  year: string;
-  book_no: string;
-  agreement_no: string;
-  tender_agency_name: string;
-  complaint_no: string;
-  complaint_date: string;
+  villageId?: number;
+  filetypeId?: number;
+  file_color?: string;
+  file_name?: string;
+  applicant_name?: string;
+  fts_no?: string;
+  file_ref_no?: string;
+  file_subject?: string;
+  survery_no?: string;
+  plot_no?: string;
+  order_no?: string;
+  order_date?: string;
+  issue_date?: string;
+  c_no_end?: string;
+  n_no_end?: string;
+  year?: string;
+  book_no?: string;
+  agreement_no?: string;
+  tender_agency_name?: string;
+  complaint_no?: string;
+  complaint_date?: string;
 }
 
 import { errorToString } from "@/utils/methods";
@@ -55,28 +55,34 @@ const SubmitMetaFile = async (
         id: is_exist.id,
       },
       data: {
-        year: payload.year,
-        villageId: payload.villageId,
-        file_typeId: payload.filetypeId,
-        filename: payload.applicant_name,
-        updatedById: payload.created_by,
-        file_no: payload.file_name,
-        fts_no: payload.fts_no,
-        file_ref_no: payload.file_ref_no,
-        survey_no: payload.survery_no,
-        plot_no: payload.plot_no,
-        order_no: payload.order_no,
-        order_date: new Date(payload.order_date),
-        complaint_no: payload.complaint_no,
-        complaint_date: new Date(payload.complaint_date),
-        issue_date: new Date(payload.issue_date),
-        subject: payload.file_subject,
-        book_no: payload.book_no,
-        file_color: payload.file_color as File_Color,
-        agreement_no: payload.agreement_no,
-        tender_agency_name: payload.tender_agency_name,
-        n_no_end: payload.n_no_end,
-        c_no_end: payload.c_no_end,
+        ...(payload.year && { year: payload.year }),
+        ...(payload.villageId && { villageId: payload.villageId }),
+        ...(payload.filetypeId && { file_typeId: payload.filetypeId }),
+        ...(payload.applicant_name && { filename: payload.applicant_name }),
+        ...(payload.created_by && { updatedById: payload.created_by }),
+        ...(payload.file_name && { file_no: payload.file_name }),
+        ...(payload.fts_no && { fts_no: payload.fts_no }),
+        ...(payload.file_ref_no && { file_ref_no: payload.file_ref_no }),
+        ...(payload.survery_no && { survey_no: payload.survery_no }),
+        ...(payload.plot_no && { plot_no: payload.plot_no }),
+        ...(payload.order_no && { order_no: payload.order_no }),
+        ...(payload.order_date && { order_date: new Date(payload.order_date) }),
+        ...(payload.complaint_no && { complaint_no: payload.complaint_no }),
+        ...(payload.complaint_date && {
+          complaint_date: new Date(payload.complaint_date),
+        }),
+        ...(payload.issue_date && { issue_date: new Date(payload.issue_date) }),
+        ...(payload.file_subject && { subject: payload.file_subject }),
+        ...(payload.book_no && { book_no: payload.book_no }),
+        ...(payload.file_color && {
+          file_color: payload.file_color as File_Color,
+        }),
+        ...(payload.agreement_no && { agreement_no: payload.agreement_no }),
+        ...(payload.tender_agency_name && {
+          tender_agency_name: payload.tender_agency_name,
+        }),
+        ...(payload.n_no_end && { n_no_end: payload.n_no_end }),
+        ...(payload.c_no_end && { c_no_end: payload.c_no_end }),
       },
     });
 

@@ -176,7 +176,9 @@ const MetaFilePage = () => {
 
       <div className="grid grid-cols-2 place-items-stretch gap-4 mt-2">
         <div className="grid place-items-start">
-          <p className="text-sm">File Type</p>
+          <p className="text-sm">
+            File Type <span className="text-rose-500">*</span>
+          </p>
 
           <Select
             className="w-full"
@@ -306,7 +308,9 @@ const MetaFilePage = () => {
 
       <div className="grid grid-cols-3 place-items-stretch gap-4 mt-2">
         <div className="grid place-items-start">
-          <p className="text-sm">Village</p>
+          <p className="text-sm">
+            Village <span className="text-rose-500">*</span>
+          </p>
           <Select
             showSearch={true}
             className="w-full"
