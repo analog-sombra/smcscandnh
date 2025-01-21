@@ -1,12 +1,14 @@
 "use client";
 import GetAllDepartment from "@/actions/department/getalldept";
 import CollectFile from "@/actions/supervisor/collectfile";
+import CompFiles from "@/actions/supervisor/compfile";
+import GetCompFile from "@/actions/supervisor/getcompfile";
 import GetSupervisorCount from "@/actions/supervisor/getcounts";
 import GetSupervisorFiles from "@/actions/supervisor/getsupervisorfiles";
 import GetUserFileData from "@/actions/supervisor/getuserfiledata";
 import { formateDate } from "@/utils/methods";
 import { department, file_base, user } from "@prisma/client";
-import { Button, Divider, Drawer, Popover, Select } from "antd";
+import { Button, Divider, Drawer, Popover, Select, Switch } from "antd";
 import { Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
@@ -20,6 +22,7 @@ const QcPage = () => {
 
   const [count, setCount] = useState<number | undefined>(undefined);
   const [deptTypes, setDeptTypes] = useState<department[]>([]);
+  const [compFile, setCompFile] = useState<file_base[]>([]);
 
   const collectfile = async () => {
     const id = getCookie("id");
@@ -134,6 +137,11 @@ const QcPage = () => {
       if (dept_response.data && dept_response.status) {
         setDeptTypes(dept_response.data);
       }
+
+      const comp_file = await GetCompFile();
+      if (comp_file.data && comp_file.status) {
+        setCompFile(comp_file.data);
+      }
     };
     init();
   }, []);
@@ -168,8 +176,70 @@ const QcPage = () => {
     undefined
   );
 
+  const [takeBool, setTakeBool] = useState<boolean[]>([]);
+  const [takeBox, setTakeBox] = useState(false);
+
+  const closeTake = () => {
+    setTakeBox(false);
+  };
+  const handleTakeSwitchChange = (switchIndex: number, checked: boolean) => {
+    setTakeBool((prev) => {
+      const updatedTakeBool = [...prev];
+      updatedTakeBool[switchIndex] = checked;
+      return updatedTakeBool;
+    });
+  };
+
+  const handleTakeSubmit = async () => {
+    // Example: Filter files where the switch is true
+    const selectedFiles: file_base[] = compFile.filter(
+      (_, fileIndex) => takeBool[fileIndex]
+    );
+
+    const response = await CompFiles({
+      files: selectedFiles,
+    });
+
+    if (response.status && response.data) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+
+    closeTake();
+  };
+
+  // take section end here
+
   return (
     <>
+      <Drawer closeIcon={null} onClose={closeTake} open={takeBox}>
+        <div className="flex gap-2 items-center justify-between">
+          <p className="text-xl font-semibold">File Take</p>
+          <Button type="primary" size="small" onClick={handleTakeSubmit}>
+            Submit
+          </Button>
+        </div>
+        <div className="overflow-y-auto h-[86vh] mt-1">
+          {compFile.length > 0 &&
+            compFile.map((file, index) => {
+              return (
+                <div
+                  key={index}
+                  className="flex border p-1 items-center justify-between"
+                >
+                  <p className="text-lg">{file.fileid}</p>
+                  <Switch
+                    checked={takeBool[index] || false}
+                    onChange={(checked) =>
+                      handleTakeSwitchChange(index, checked)
+                    }
+                  />
+                </div>
+              );
+            })}
+        </div>
+      </Drawer>
       <div className="w-full md:mx-auto md:w-4/6 grid grid-cols-4 gap-2 items-center mt-2">
         <div className="bg-white border  rounded p-2">
           <p className="text-left text-sm">Total file in hand</p>
@@ -254,8 +324,13 @@ const QcPage = () => {
         <Button type="primary" onClick={() => setOpen(true)}>
           Daily File
         </Button>
-        <Button type="primary" onClick={() => setPopOpen(true)}>
-          Collect File Staff
+        <Button
+          type="primary"
+          onClick={() => {
+            setTakeBox(true);
+          }}
+        >
+          Give File Dept
         </Button>
       </div>
 

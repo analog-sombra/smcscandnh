@@ -139,6 +139,8 @@ model file {
     tender_agency_name String?
     n_no_end           String? // noting no end
     c_no_end           String? // correspondence no end
+    old_file_no        String?
+    remarks            String?
 
     village   village? @relation(fields: [villageId], references: [id])
     villageId Int?

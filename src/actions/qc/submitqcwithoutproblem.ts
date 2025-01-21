@@ -36,6 +36,9 @@ const SubmitQcFileWithoutProblem = async (
       data: {
         qc_end: new Date(),
         updatedById: payload.created_by,
+        verify_start: new Date(),
+        verify_end: new Date(),
+        verifyid: 26,
       },
     });
 

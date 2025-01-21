@@ -57,6 +57,8 @@ const MetaFilePage = () => {
     tender_agency_name: string;
     complaint_no: string;
     complaint_date: string;
+    old_file_no: string;
+    remarks: string;
   }
 
   const [data, setData] = useState<DataInterface>({
@@ -79,6 +81,8 @@ const MetaFilePage = () => {
     tender_agency_name: "",
     complaint_no: "",
     complaint_date: "",
+    old_file_no: "",
+    remarks: "",
   });
 
   const servalue = (key: string, value: string) => {
@@ -276,7 +280,7 @@ const MetaFilePage = () => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-2 place-items-stretch gap-4 mt-2">
+      <div className="grid grid-cols-3 place-items-stretch gap-4 mt-2">
         <div className="grid place-items-start">
           <p className="text-sm">FTS No</p>
           <Input
@@ -293,6 +297,15 @@ const MetaFilePage = () => {
             className="w-full"
             onChange={(e) => servalue("file_ref_no", e.target.value)}
             value={data.file_ref_no}
+          />
+        </div>
+        <div className="grid place-items-start">
+          <p className="text-sm">Old File No</p>
+          <Input
+            placeholder="Enter old file no"
+            className="w-full"
+            onChange={(e) => servalue("old_file_no", e.target.value)}
+            value={data.old_file_no}
           />
         </div>
       </div>
@@ -476,6 +489,16 @@ const MetaFilePage = () => {
             value={data.complaint_date ? dayjs(data.complaint_date) : undefined}
           />
         </div>
+      </div>
+
+      <div className="grid place-items-start mt-2">
+        <p className="text-sm">Remarks</p>
+        <Input
+          placeholder="Enter remarks"
+          className="w-full"
+          onChange={(e) => servalue("remarks", e.target.value)}
+          value={data.remarks}
+        />
       </div>
 
       <div className="w-full flex items-center mt-2">

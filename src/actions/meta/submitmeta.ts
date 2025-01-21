@@ -23,6 +23,8 @@ interface SubmitMetaFilePayload {
   tender_agency_name?: string;
   complaint_no?: string;
   complaint_date?: string;
+  old_file_no?: string;
+  remarks?: string;
 }
 
 import { errorToString } from "@/utils/methods";
@@ -83,6 +85,8 @@ const SubmitMetaFile = async (
         }),
         ...(payload.n_no_end && { n_no_end: payload.n_no_end }),
         ...(payload.c_no_end && { c_no_end: payload.c_no_end }),
+        ...(payload.old_file_no && { old_file_no: payload.old_file_no }),
+        ...(payload.remarks && { remarks: payload.remarks }),
       },
     });
 

@@ -180,11 +180,6 @@ const QcPage = () => {
             Request File
           </Button>
         </Popover>
-        {/* <Search
-          className="w-40"
-          placeholder="input search text"
-          loading={false}
-        /> */}
       </div>
       <div className="w-full md:mx-auto md:w-4/6 mt-2 grid grid-cols-8 items-center  gap-2">
         {files.map((file, index: number) => (
