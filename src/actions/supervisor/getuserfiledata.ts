@@ -5,6 +5,10 @@ import { Status } from "@prisma/client";
 import prisma from "../../../prisma/database";
 import { ApiResponseType, createResponse } from "@/models/response";
 
+interface GetUserFileDataPayload {
+  date: Date;
+}
+
 interface ResponseType {
   username: string;
   role: string;
@@ -15,13 +19,14 @@ interface ResponseType {
   totalpagecount: number;
 }
 
-const GetUserFileData = async (): Promise<
-  ApiResponseType<ResponseType[] | null>
-> => {
+const GetUserFileData = async (
+  payload: GetUserFileDataPayload
+): Promise<ApiResponseType<ResponseType[] | null>> => {
   const functionname: string = GetUserFileData.name;
 
   try {
-    const currentDate = new Date();
+    // const currentDate = new Date();
+    const currentDate = payload.date;
     const startOfDay = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),

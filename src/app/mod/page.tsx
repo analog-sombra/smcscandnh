@@ -142,6 +142,8 @@ const ScannerPage = () => {
       (_, fileIndex) => takeBool[fileIndex]
     );
 
+    console.log(selectedFiles);
+
     const response = await ModTakeFiles({
       files: selectedFiles,
     });
@@ -235,7 +237,7 @@ const ScannerPage = () => {
         <div className="overflow-y-auto h-[86vh] mt-1">
           {files.length > 0 &&
             files[index].files
-              .filter((val) => val.scan_end != null && val.mod_end == null)
+              // .filter((val) => val.scan_end != null && val.mod_end == null)
               .map((file, index) => {
                 return (
                   <div
@@ -243,12 +245,24 @@ const ScannerPage = () => {
                     className="flex border p-1 items-center justify-between"
                   >
                     <p className="text-lg">{file.fileid}</p>
-                    <Switch
-                      checked={takeBool[index] || false}
-                      onChange={(checked) =>
-                        handleTakeSwitchChange(index, checked)
-                      }
-                    />
+                    {file.scan_start != null &&
+                    file.scan_end == null &&
+                    file.mod_end == null ? null : (
+                      <Switch
+                        disabled={
+                          !(file.scan_end != null && file.mod_end == null)
+                        }
+                        // checked={takeBool[index] || false}
+                        checked={
+                          !(file.scan_end != null && file.mod_end == null)
+                            ? true
+                            : takeBool[index] || false
+                        }
+                        onChange={(checked) =>
+                          handleTakeSwitchChange(index, checked)
+                        }
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -264,7 +278,7 @@ const ScannerPage = () => {
         <div className="overflow-y-auto h-[86vh] mt-1">
           {files.length > 0 &&
             files[index].files
-              .filter((val) => !val.is_scan)
+              // .filter((val) => !val.is_scan)
               .map((file, index) => {
                 return (
                   <div
@@ -273,7 +287,8 @@ const ScannerPage = () => {
                   >
                     <p className="text-lg">{file.fileid}</p>
                     <Switch
-                      checked={giveBool[index] || false}
+                      disabled={file.is_scan}
+                      checked={file.is_scan ? true : giveBool[index] || false}
                       onChange={(checked) =>
                         handleGiveSwitchChange(index, checked)
                       }

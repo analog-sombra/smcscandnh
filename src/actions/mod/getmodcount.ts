@@ -28,6 +28,7 @@ const GetModCount = async (
         scan_start: {
           not: null,
         },
+        mod_end: null,
         status: "ACTIVE",
       },
     });
@@ -39,6 +40,7 @@ const GetModCount = async (
         mod_start: {
           not: null,
         },
+        mod_end: null,
         status: "ACTIVE",
       },
     });

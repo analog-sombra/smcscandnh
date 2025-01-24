@@ -13,6 +13,9 @@ interface SubmitMetaFilePayload {
   survery_no?: string;
   plot_no?: string;
   order_no?: string;
+  file_head?: string;
+  file_start?: string;
+  file_end?: string;
   order_date?: string;
   issue_date?: string;
   c_no_end?: string;
@@ -68,6 +71,9 @@ const SubmitMetaFile = async (
         ...(payload.survery_no && { survey_no: payload.survery_no }),
         ...(payload.plot_no && { plot_no: payload.plot_no }),
         ...(payload.order_no && { order_no: payload.order_no }),
+        ...(payload.file_head && { file_head: payload.file_head }),
+        ...(payload.file_start && { file_start: new Date(payload.file_start) }),
+        ...(payload.file_end && { file_end: new Date(payload.file_end) }),
         ...(payload.order_date && { order_date: new Date(payload.order_date) }),
         ...(payload.complaint_no && { complaint_no: payload.complaint_no }),
         ...(payload.complaint_date && {

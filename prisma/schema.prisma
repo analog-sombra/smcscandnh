@@ -36,6 +36,7 @@ enum File_Color {
     LIGHT_BLUE
     ORANGE
     BROWN
+    GREY
 }
 
 model user {
@@ -141,6 +142,9 @@ model file {
     c_no_end           String? // correspondence no end
     old_file_no        String?
     remarks            String?
+    file_start         DateTime?
+    file_end           DateTime?
+    file_head          String?
 
     village   village? @relation(fields: [villageId], references: [id])
     villageId Int?

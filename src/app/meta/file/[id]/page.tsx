@@ -47,6 +47,9 @@ const MetaFilePage = () => {
     survery_no: string;
     plot_no: string;
     order_no: string;
+    file_head: string;
+    file_start: string;
+    file_end: string;
     order_date: string;
     issue_date: string;
     c_no_end: string;
@@ -71,6 +74,9 @@ const MetaFilePage = () => {
     survery_no: "",
     plot_no: "",
     order_no: "",
+    file_head: "",
+    file_start: "",
+    file_end: "",
     order_date: "",
     issue_date: "",
     c_no_end: "",
@@ -249,6 +255,10 @@ const MetaFilePage = () => {
                 value: "BROWN",
                 label: "Brown",
               },
+              {
+                value: "GREY",
+                label: "Grey",
+              },
             ].map((files) => ({
               value: files.value,
               label: files.label,
@@ -306,6 +316,46 @@ const MetaFilePage = () => {
             className="w-full"
             onChange={(e) => servalue("old_file_no", e.target.value)}
             value={data.old_file_no}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 place-items-stretch gap-4 mt-2">
+        <div className="grid place-items-start">
+          <p className="text-sm">File Head</p>
+          <Input
+            placeholder="Enter File head"
+            className="w-full"
+            onChange={(e) => servalue("file_head", e.target.value)}
+            value={data.file_head}
+          />
+        </div>
+        <div className="grid place-items-start">
+          <p className="text-sm">File Start Date</p>
+          {/* stop max date in future using dayjs */}
+          <DatePicker
+            placeholder="Enter File Start Date"
+            className="w-full"
+            maxDate={dayjs(new Date())}
+            onChange={(date) => {
+              if (date) {
+                servalue("file_start", date.format("YYYY-MM-DD"));
+              }
+            }}
+            value={data.file_start ? dayjs(data.file_start) : undefined}
+          />
+        </div>
+        <div className="grid place-items-start">
+          <p className="text-sm">File End Date</p>
+          <DatePicker
+            placeholder="Enter File End Date"
+            className="w-full"
+            maxDate={dayjs(new Date())}
+            onChange={(date) => {
+              if (date) {
+                servalue("file_end", date.format("YYYY-MM-DD"));
+              }
+            }}
+            value={data.file_end ? dayjs(data.file_end) : undefined}
           />
         </div>
       </div>

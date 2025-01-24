@@ -2,10 +2,11 @@
 "use client";
 
 import Logout from "@/actions/user/logout";
-import { FluentPerson20Filled } from "@/components/icons";
+import { FluentPerson20Filled, FluentPersonLock16Regular } from "@/components/icons";
 import { Role } from "@prisma/client";
 import { Button } from "antd";
 import { getCookie, hasCookie } from "cookies-next/client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -67,6 +68,9 @@ export default function RootLayout({
 
           <p>{getCookie("username")} (Mod)</p>
           <div className="grow"></div>
+          <Link href="/changepassword">
+            <FluentPersonLock16Regular className="text-gray-600" />
+          </Link>
           <Button size="small" type="primary" danger onClick={logout}>
             Logout
           </Button>

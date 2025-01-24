@@ -2,10 +2,10 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import GetfileById from "@/actions/file/getfilebyid";
-import SubmitQcFile from "@/actions/qc/submitqc";
+// import SubmitQcFile from "@/actions/qc/submitqc";
 import SubmitQcFileWithoutProblem from "@/actions/qc/submitqcwithoutproblem";
 import { decryptURLData, formateDate } from "@/utils/methods";
-import { file, file_type, village } from "@prisma/client";
+import { department, file, file_type, village } from "@prisma/client";
 import { Button, Divider, Switch, Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import { useParams, useRouter } from "next/navigation";
@@ -22,7 +22,12 @@ const QcFilePage = () => {
   const [isLoading, setLoading] = useState<boolean>(true);
 
   const [file, setFile] = useState<
-    (file & { village: village | null; file_type: file_type | null }) | null
+    | (file & {
+        village: village | null;
+        file_type: file_type | null;
+        department: department | null;
+      })
+    | null
   >(null);
 
   useEffect(() => {
@@ -62,47 +67,47 @@ const QcFilePage = () => {
     wrong_page_count: false,
   });
 
-  const onsubmitwithproblme = async () => {
-    const id = getCookie("id");
+  // const onsubmitwithproblme = async () => {
+  //   const id = getCookie("id");
 
-    if (id == null) {
-      toast.error("User not found");
-      return router.push("/login");
-    }
+  //   if (id == null) {
+  //     toast.error("User not found");
+  //     return router.push("/login");
+  //   }
 
-    if (remark == null || remark == undefined || remark == "") {
-      return toast.error("Enter remark");
-    }
-    if (
-      problem.wrong_page_count == false &&
-      problem.corrupt_file == false &&
-      problem.full_scan == false &&
-      problem.improper_scan == false &&
-      problem.wrong_meta == false &&
-      problem.wrong_cover == false
-    ) {
-      return toast.error("Select any problem");
-    }
+  //   if (remark == null || remark == undefined || remark == "") {
+  //     return toast.error("Enter remark");
+  //   }
+  //   if (
+  //     problem.wrong_page_count == false &&
+  //     problem.corrupt_file == false &&
+  //     problem.full_scan == false &&
+  //     problem.improper_scan == false &&
+  //     problem.wrong_meta == false &&
+  //     problem.wrong_cover == false
+  //   ) {
+  //     return toast.error("Select any problem");
+  //   }
 
-    const response = await SubmitQcFile({
-      id: fileid,
-      created_by: parseInt(id),
-      remark: remark,
-      wrong_page_count: problem.wrong_page_count,
-      corrupt_file: problem.corrupt_file,
-      full_rescan: problem.full_scan,
-      improper_scan: problem.improper_scan,
-      meta_improper: problem.wrong_meta,
-      wrong_cover: problem.wrong_cover,
-      wrong_file_id: false,
-    });
-    if (response.data && response.status) {
-      toast.success(response.message);
-      router.back();
-    } else {
-      return toast.error(response.message);
-    }
-  };
+  //   const response = await SubmitQcFile({
+  //     id: fileid,
+  //     created_by: parseInt(id),
+  //     remark: remark,
+  //     wrong_page_count: problem.wrong_page_count,
+  //     corrupt_file: problem.corrupt_file,
+  //     full_rescan: problem.full_scan,
+  //     improper_scan: problem.improper_scan,
+  //     meta_improper: problem.wrong_meta,
+  //     wrong_cover: problem.wrong_cover,
+  //     wrong_file_id: false,
+  //   });
+  //   if (response.data && response.status) {
+  //     toast.success(response.message);
+  //     router.back();
+  //   } else {
+  //     return toast.error(response.message);
+  //   }
+  // };
 
   const onsubmitwithoutproblme = async () => {
     const id = getCookie("id");
@@ -149,7 +154,7 @@ const QcFilePage = () => {
     <div className="w-full md:mx-auto md:w-4/6 p-2 bg-white border rounded mt-2">
       <p className="text-2xl font-semibold text-left">Problem File</p>
       <Divider dashed className="my-2" />
-      <div className="grid grid-cols-1 lg:grid-cols-4 place-items-stretch gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 place-items-stretch gap-2">
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">Id</p>
           <p className="text-lg">{file?.fileid}</p>
@@ -165,6 +170,16 @@ const QcFilePage = () => {
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">Large Size</p>
           <p className="text-lg">{file?.large_page_count}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">Department</p>
+          <p className="text-lg">
+            {file?.department?.name} ({file?.department?.wing})
+          </p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">File Head</p>
+          <p className="text-lg">{file?.file_head}</p>
         </div>
 
         <div className="rounded-lg p-2 bg-gray-100">
@@ -253,7 +268,7 @@ const QcFilePage = () => {
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">Complaint Date</p>
           <p className="text-lg">
-            {formateDate(file?.complaint_date ?? new Date())}
+            {file?.complaint_date ? formateDate(file?.complaint_date) : "NA"}
           </p>
         </div>
 
@@ -264,6 +279,18 @@ const QcFilePage = () => {
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">N No End</p>
           <p className="text-lg">{file?.n_no_end}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">File Start</p>
+          <p className="text-lg">
+            {file?.file_start && formateDate(file?.file_start)}
+          </p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">File End</p>
+          <p className="text-lg">
+            {file?.file_end && formateDate(file?.file_end)}
+          </p>
         </div>
       </div>
 
@@ -278,10 +305,10 @@ const QcFilePage = () => {
         {[
           { label: "Wrong File Cover", key: "wrong_cover" },
           { label: "Wrong Meta", key: "wrong_meta" },
-          { label: "Improper Scanning", key: "improper_scan" },
-          { label: "Full Scanning", key: "full_scan" },
+          // { label: "Improper Scanning", key: "improper_scan" },
+          // { label: "Full Scanning", key: "full_scan" },
           { label: "Wrong Page Count", key: "wrong_page_count" },
-          { label: "Corrupt File", key: "corrupt_file" },
+          // { label: "Corrupt File", key: "corrupt_file" },
         ].map(({ label, key }) => (
           <div key={key} className="border p-2 flex gap-2 items-center">
             <p className="text-sm">{label}</p>
@@ -306,14 +333,14 @@ const QcFilePage = () => {
           complete without problem
         </Button>
         <div className="grow"></div>
-        <Button
+        {/* <Button
           type="primary"
           size="small"
           onClick={onsubmitwithproblme}
           className="bg-rose-500"
         >
           complete with problem
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

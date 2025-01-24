@@ -21,6 +21,9 @@ const ResolveProblmeFile = async (
         status: "ACTIVE",
         id: payload.id,
       },
+      include: {
+        filebase: true,
+      },
     });
 
     if (!is_exist) {
@@ -30,17 +33,28 @@ const ResolveProblmeFile = async (
       });
     }
 
-    const file_response = await prisma.problem_file.updateMany({
+    const update_response = await prisma.file_base.update({
       where: {
-        fileId: is_exist.id,
+        id: payload.id,
       },
       data: {
-        remarks: payload.remark,
-        status: "COMPLETED",
+        // qc_start: new Date(),
+        qc_end: new Date(),
+        // qcid: payload.created_by,
       },
     });
 
-    if (!file_response) {
+    // const file_response = await prisma.problem_file.updateMany({
+    //   where: {
+    //     fileId: is_exist.id,
+    //   },
+    //   data: {
+    //     remarks: payload.remark,
+    //     status: "COMPLETED",
+    //   },
+    // });
+
+    if (!update_response) {
       return createResponse({
         functionname: functionname,
         message: "File problem not updated",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import GetAllDepartment from "@/actions/department/getalldept";
 import CollectFile from "@/actions/supervisor/collectfile";
@@ -6,14 +7,24 @@ import GetCompFile from "@/actions/supervisor/getcompfile";
 import GetSupervisorCount from "@/actions/supervisor/getcounts";
 import GetSupervisorFiles from "@/actions/supervisor/getsupervisorfiles";
 import GetUserFileData from "@/actions/supervisor/getuserfiledata";
-import { formateDate } from "@/utils/methods";
+// import { formateDate } from "@/utils/methods";
 import { department, file_base, user } from "@prisma/client";
-import { Button, Divider, Drawer, Popover, Select, Switch } from "antd";
+import { format } from "date-fns";
+import {
+  Button,
+  DatePicker,
+  Divider,
+  Drawer,
+  Popover,
+  Select,
+  Switch,
+} from "antd";
 import { Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 const QcPage = () => {
   const router = useRouter();
@@ -118,6 +129,32 @@ const QcPage = () => {
 
   const [userFiles, setUserFiles] = useState<UserResponseFile[]>();
 
+  const current_date = new Date();
+
+  const [date, setDate] = useState<string | undefined>();
+
+  const onChange = async (date: any) => {
+    const fordate = format(date, "yyyy-MM-dd");
+    setDate(fordate);
+
+    const user_response = await GetUserFileData({
+      date: new Date(date),
+    });
+    if (user_response.data && user_response.status) {
+      setUserFiles(user_response.data);
+    }
+  };
+
+  // const searchDate = async () => {
+  //   if (date == undefined) return;
+  //   const user_response = await GetUserFileData({
+  //     date: new Date(date),
+  //   });
+  //   if (user_response.data && user_response.status) {
+  //     setUserFiles(user_response.data);
+  //   }
+  // };
+
   useEffect(() => {
     const init = async () => {
       const response = await GetSupervisorCount();
@@ -129,7 +166,9 @@ const QcPage = () => {
       if (file_response.data && file_response.status) {
         setFiles(file_response.data);
       }
-      const user_response = await GetUserFileData();
+      const user_response = await GetUserFileData({
+        date: date ? new Date(date) : current_date,
+      });
       if (user_response.data && user_response.status) {
         setUserFiles(user_response.data);
       }
@@ -413,8 +452,13 @@ const QcPage = () => {
         open={open}
         size="large"
       >
-        <div className="text-lg font-semibold text-center">
-          {formateDate(new Date())}
+        <div className="text-lg font-semibold text-center flex justify-between">
+          <p>{format(date ?? current_date, "yyyy-MM-dd")}</p>
+          <div className="grow"></div>
+          <DatePicker
+            onChange={onChange}
+            maxDate={dayjs(new Date(), "yyyy-MM-dd")}
+          />
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

@@ -34,6 +34,7 @@ const GetModRequest = async (
         mod_start: {
           not: null,
         },
+        mod_end: null,
       },
       include: {
         scan: true,

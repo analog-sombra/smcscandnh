@@ -6,7 +6,13 @@ interface GetProblmefileByIdPayload {
 import { errorToString } from "@/utils/methods";
 import prisma from "../../../prisma/database";
 import { ApiResponseType, createResponse } from "@/models/response";
-import { file, file_type, problem_file, village } from "@prisma/client";
+import {
+  department,
+  file,
+  file_type,
+  problem_file,
+  village,
+} from "@prisma/client";
 
 const GetProblmefileById = async (
   payload: GetProblmefileByIdPayload
@@ -16,6 +22,7 @@ const GetProblmefileById = async (
         village: village | null;
         file_type: file_type | null;
         problem_file: problem_file[] | null;
+        department: department | null;
       })
     | null
   >
@@ -32,6 +39,7 @@ const GetProblmefileById = async (
         problem_file: true,
         village: true,
         file_type: true,
+        department: true,
       },
     });
 

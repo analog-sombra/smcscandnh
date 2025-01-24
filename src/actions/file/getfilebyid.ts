@@ -6,13 +6,18 @@ interface GetfileByIdPayload {
 import { errorToString } from "@/utils/methods";
 import prisma from "../../../prisma/database";
 import { ApiResponseType, createResponse } from "@/models/response";
-import { file, file_type, village } from "@prisma/client";
+import { department, file, file_type, village } from "@prisma/client";
 
 const GetfileById = async (
   payload: GetfileByIdPayload
 ): Promise<
   ApiResponseType<
-    (file & { village: village | null; file_type: file_type | null }) | null
+    | (file & {
+        village: village | null;
+        file_type: file_type | null;
+        department: department | null;
+      })
+    | null
   >
 > => {
   const functionname: string = GetfileById.name;
@@ -26,6 +31,7 @@ const GetfileById = async (
       include: {
         village: true,
         file_type: true,
+        department: true,
       },
     });
 
