@@ -132,7 +132,17 @@ const VerifyFilePage = () => {
 
   return (
     <div className="w-full md:mx-auto md:w-4/6 p-2 bg-white border rounded mt-2">
-      <p className="text-2xl font-semibold text-left">Problem File</p>
+      <div className="flex justify-between items-center">
+        <p className="text-2xl font-semibold text-left">Problem File</p>
+        <div className="grow"></div>
+        <Button
+          onClick={() => {
+            router.back();
+          }}
+        >
+          Back
+        </Button>
+      </div>
       <Divider dashed className="my-2" />
       <div className="grid grid-cols-2 lg:grid-cols-4 place-items-stretch gap-2">
         <div className="rounded-lg p-2 bg-gray-100">

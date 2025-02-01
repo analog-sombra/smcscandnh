@@ -117,7 +117,7 @@ const QcFilePage = () => {
       return router.push("/login");
     }
 
-    if (remark!.length > 0) {
+    if ((remark ? remark : "").length > 0) {
       return toast.error("Remove the remark first then submit");
     }
 
@@ -152,7 +152,17 @@ const QcFilePage = () => {
 
   return (
     <div className="w-full md:mx-auto md:w-4/6 p-2 bg-white border rounded mt-2">
-      <p className="text-2xl font-semibold text-left">Problem File</p>
+      <div className="flex justify-between items-center">
+        <p className="text-2xl font-semibold text-left">Problem File</p>
+        <div className="grow"></div>
+        <Button
+          onClick={() => {
+            router.back();
+          }}
+        >
+          Back
+        </Button>
+      </div>
       <Divider dashed className="my-2" />
       <div className="grid grid-cols-2 lg:grid-cols-4 place-items-stretch gap-2">
         <div className="rounded-lg p-2 bg-gray-100">
@@ -183,6 +193,15 @@ const QcFilePage = () => {
         </div>
 
         <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">File Ref No</p>
+          <p className="text-lg">{file?.file_ref_no}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">Old File NO</p>
+          <p className="text-lg">{file?.old_file_no}</p>
+        </div>
+
+        <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">File Type</p>
           <p className="text-lg">{file?.file_type?.name}</p>
         </div>
@@ -209,10 +228,6 @@ const QcFilePage = () => {
           <p className="text-lg">{file?.filename}</p>
         </div>
 
-        <div className="rounded-lg p-2 bg-gray-100 col-span-2">
-          <p className="text-sm">File Ref No</p>
-          <p className="text-lg">{file?.file_ref_no}</p>
-        </div>
         <div className="rounded-lg p-2 bg-gray-100 col-span-2">
           <p className="text-sm">File Subject</p>
           <p className="text-lg">{file?.subject}</p>
@@ -279,6 +294,10 @@ const QcFilePage = () => {
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">N No End</p>
           <p className="text-lg">{file?.n_no_end}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100  col-span-2">
+          <p className="text-sm">Remarks</p>
+          <p className="text-lg">{file?.remarks}</p>
         </div>
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">File Start</p>

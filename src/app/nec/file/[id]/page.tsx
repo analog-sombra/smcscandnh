@@ -90,7 +90,14 @@ const QcFilePage = () => {
           <p className="text-sm">File Head</p>
           <p className="text-lg">{file?.file_head}</p>
         </div>
-
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">File Ref No</p>
+          <p className="text-lg">{file?.file_ref_no}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100">
+          <p className="text-sm">Old File NO</p>
+          <p className="text-lg">{file?.old_file_no}</p>
+        </div>
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">File Type</p>
           <p className="text-lg">{file?.file_type?.name}</p>
@@ -118,10 +125,6 @@ const QcFilePage = () => {
           <p className="text-lg">{file?.filename}</p>
         </div>
 
-        <div className="rounded-lg p-2 bg-gray-100 col-span-2">
-          <p className="text-sm">File Ref No</p>
-          <p className="text-lg">{file?.file_ref_no}</p>
-        </div>
         <div className="rounded-lg p-2 bg-gray-100 col-span-2">
           <p className="text-sm">File Subject</p>
           <p className="text-lg">{file?.subject}</p>
@@ -188,6 +191,10 @@ const QcFilePage = () => {
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">N No End</p>
           <p className="text-lg">{file?.n_no_end}</p>
+        </div>
+        <div className="rounded-lg p-2 bg-gray-100  col-span-2">
+          <p className="text-sm">Remarks</p>
+          <p className="text-lg">{file?.remarks}</p>
         </div>
         <div className="rounded-lg p-2 bg-gray-100">
           <p className="text-sm">File Start</p>

@@ -37,6 +37,7 @@ enum File_Color {
     ORANGE
     BROWN
     GREY
+    PURPLE
 }
 
 model user {

@@ -69,7 +69,7 @@ const QcPage = () => {
           <p className="text-left text-xl">{counts.meta_file}</p>
         </div>
         <div className="bg-white border  rounded p-2">
-          <p className="text-left text-sm">Verifed Completed</p>
+          <p className="text-left text-sm">Verified Completed</p>
           <p className="text-left text-xl">{counts.completed_file}</p>
         </div>
       </div>
@@ -87,7 +87,7 @@ const QcPage = () => {
           </p>
         </div>
         <div className="bg-white border  rounded p-2">
-          <p className="text-left text-sm">Verifed Page Count</p>
+          <p className="text-left text-sm">Verified Page Count</p>
           <p className="text-left text-xl">
             {counts.scansmall}/{counts.scanmed}/{counts.scanlarge}
           </p>

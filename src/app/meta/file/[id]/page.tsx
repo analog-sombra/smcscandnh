@@ -163,7 +163,17 @@ const MetaFilePage = () => {
 
   return (
     <div className="w-full md:mx-auto md:w-4/6 p-2 bg-white border rounded mt-2">
-      <p className="text-2xl font-semibold text-left">Add Meta Data</p>
+      <div className="flex justify-between items-center">
+        <p className="text-2xl font-semibold text-left">Add Meta Data</p>
+        <div className="grow"></div>
+        <Button
+          onClick={() => {
+            router.back();
+          }}
+        >
+          Back
+        </Button>
+      </div>
       <Divider dashed className="my-2" />
       <div className="grid grid-cols-4 place-items-stretch gap-4">
         <div className="rounded-lg p-2 bg-gray-100">
@@ -258,6 +268,10 @@ const MetaFilePage = () => {
               {
                 value: "GREY",
                 label: "Grey",
+              },
+              {
+                value: "PURPLE",
+                label: "Purple",
               },
             ].map((files) => ({
               value: files.value,
