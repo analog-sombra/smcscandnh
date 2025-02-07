@@ -273,6 +273,10 @@ const MetaFilePage = () => {
                 value: "PURPLE",
                 label: "Purple",
               },
+              {
+                value: "WHITE",
+                label: "White",
+              },
             ].map((files) => ({
               value: files.value,
               label: files.label,
