@@ -354,6 +354,7 @@ const MetaFilePage = () => {
             placeholder="Enter File Start Date"
             className="w-full"
             maxDate={dayjs(new Date())}
+            format="DD-MM-YYYY"
             onChange={(date) => {
               if (date) {
                 servalue("file_start", date.format("YYYY-MM-DD"));
@@ -367,6 +368,7 @@ const MetaFilePage = () => {
           <DatePicker
             placeholder="Enter File End Date"
             className="w-full"
+            format="DD-MM-YYYY"
             maxDate={dayjs(new Date())}
             onChange={(date) => {
               if (date) {
@@ -449,6 +451,7 @@ const MetaFilePage = () => {
           <DatePicker
             placeholder="Enter Order Date"
             className="w-full"
+            format="DD-MM-YYYY"
             maxDate={dayjs(new Date())}
             onChange={(date) => {
               if (date) {
@@ -463,6 +466,7 @@ const MetaFilePage = () => {
           <DatePicker
             placeholder="Enter Issue Date"
             className="w-full"
+            format="DD-MM-YYYY"
             maxDate={dayjs(new Date())}
             onChange={(date) => {
               if (date) {
@@ -548,6 +552,7 @@ const MetaFilePage = () => {
           <DatePicker
             placeholder="Enter Complaint Date"
             className="w-full"
+            format="DD-MM-YYYY"
             maxDate={dayjs(new Date())}
             onChange={(date) => {
               if (date) {

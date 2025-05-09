@@ -456,6 +456,7 @@ const QcPage = () => {
           <p>{format(date ?? current_date, "yyyy-MM-dd")}</p>
           <div className="grow"></div>
           <DatePicker
+            format="DD-MM-YYYY"
             onChange={onChange}
             maxDate={dayjs(new Date(), "yyyy-MM-dd")}
           />
