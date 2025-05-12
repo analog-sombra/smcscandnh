@@ -135,7 +135,7 @@ model file {
     complaint_no       String?
     complaint_date     DateTime?
     issue_date         DateTime?
-    subject            String?
+    subject            String?     @db.MediumText
     book_no            String? // measurment book no
     file_color         File_Color?
     agreement_no       String?
