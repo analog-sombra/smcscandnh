@@ -32,7 +32,7 @@ const LoginPage = () => {
       case Role.ADMIN:
         return "/admin";
       case Role.DEPARTMENT:
-        return "/department";
+        return "/dashboard";
       case Role.META:
         return "/meta";
       case Role.MOD:

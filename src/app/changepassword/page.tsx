@@ -1,7 +1,7 @@
 "use client";
 
 import ChangePassword from "@/actions/user/chnagepassword";
-import { ChangepasswordSchema } from "@/schemas/chamgepassword";
+import { ChangepasswordSchema } from "@/schemas/changepassword";
 import { Button, Input } from "antd";
 import { getCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
