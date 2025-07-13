@@ -5,6 +5,7 @@ import GetPdfFiles from "@/actions/file/getpdflist";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { formateDate } from "@/utils/methods";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,9 +28,9 @@ const ViewFile = (props: ViewFileProps) => {
 
   const [isLoading, setLoading] = useState<boolean>(true);
   const [filedata, setFileData] = useState<any>(null);
-  const [files, setFiles] = useState<filedata[]>([]);
+  // const [files, setFiles] = useState<filedata[]>([]);
 
-  const [pdffile, setPdffile] = useState<string | null>(null);
+  // const [pdffile, setPdffile] = useState<string | null>(null);
 
   interface filedata {
     id: number;
@@ -44,13 +45,14 @@ const ViewFile = (props: ViewFileProps) => {
       const response = await GetFile({ id: props.fileid });
 
       if (response.status) {
+        console.log(response.data);
         setFileData((val: any) => response.data);
-        const responsefile = await GetPdfFiles({
-          location: response.data?.physical_file_locationId?.toString() ?? "",
-        });
-        if (responsefile.data) {
-          setFiles(responsefile.data);
-        }
+        // const responsefile = await GetPdfFiles({
+        //   location: response.data?.physical_file_locationId?.toString() ?? "",
+        // });
+        // if (responsefile.data) {
+        //   setFiles(responsefile.data);
+        // }
       } else {
         toast.error(response.message);
       }
@@ -59,6 +61,20 @@ const ViewFile = (props: ViewFileProps) => {
     };
     init();
   }, [props.fileid]);
+
+  const color = [
+    { name: "DARK_BLUE", value: "Dark Blue" },
+    { name: "YELLOW", value: "Yellow" },
+    { name: "GREEN", value: "Green" },
+    { name: "RED", value: "Red" },
+    { name: "PINK", value: "Pink" },
+    { name: "LIGHT_BLUE", value: "Light Blue" },
+    { name: "ORANGE", value: "Orange" },
+    { name: "BROWN", value: "Brown" },
+    { name: "GREY", value: "Grey" },
+    { name: "PURPLE", value: "Purple" },
+    { name: "WHITE", value: "White" },
+  ];
 
   if (isLoading)
     return (
@@ -82,21 +98,15 @@ const ViewFile = (props: ViewFileProps) => {
           </div>
           <div className="flex gap-2 items-center mt-2">
             <label htmlFor="fileid" className="w-60">
-              Old File No :
-            </label>
-            <p>{filedata.file_no}</p>
-          </div>
-          <div className="flex gap-2 items-center mt-2">
-            <label htmlFor="fileid" className="w-60">
               File Type :
             </label>
             <p>{filedata.file_type.name}</p>
           </div>
           <div className="flex gap-2 items-center mt-2">
             <label htmlFor="fileid" className="w-60">
-              Village :
+              File Title :
             </label>
-            <p>{filedata.village.name}</p>
+            <p>{filedata.file_no}</p>
           </div>
           <div className="flex gap-2 items-center  mt-2">
             <label htmlFor="name" className="w-60">
@@ -104,17 +114,82 @@ const ViewFile = (props: ViewFileProps) => {
             </label>
             <p>{filedata.filename}</p>
           </div>
+
+          <div className="flex gap-2 items-center mt-2">
+            <label htmlFor="fileid" className="w-60">
+              Village :
+            </label>
+            <p>{filedata.village.name}</p>
+          </div>
+          <div className="flex gap-2 items-center mt-2">
+            <label htmlFor="fileid" className="w-60">
+              Survey No :
+            </label>
+            <p>{filedata.survey_no}</p>
+          </div>
+          <div className="flex gap-2 items-center mt-2">
+            <label htmlFor="fileid" className="w-60">
+              Plot No :
+            </label>
+            <p>{filedata.plot_no}</p>
+          </div>
+
           <div className="flex gap-2 items-center  mt-2">
             <label htmlFor="survey" className="w-60">
               File Color :
             </label>
-            <p>{filedata.file_color}</p>
+            {/* <p>{filedata.file_color}</p> */}
+            <p>
+              {color.find((val) => val.name === filedata.file_color)?.value}
+            </p>
           </div>
           <div className="flex gap-2 items-center  mt-2">
             <label htmlFor="year" className="w-60">
               Year :
             </label>
             <p>{filedata.year}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              Agreement No :
+            </label>
+            <p>{filedata.agreement_no}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              C Side end :
+            </label>
+            <p>{filedata.c_no_end}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              N Side end :
+            </label>
+            <p>{filedata.n_no_end}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              Order Date :
+            </label>
+            <p>{formateDate(new Date(filedata.order_date.toString()))}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              Order no :
+            </label>
+            <p>{filedata.order_no}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              Subject :
+            </label>
+            <p>{filedata.subject}</p>
+          </div>
+          <div className="flex gap-2 items-center  mt-2">
+            <label htmlFor="year" className="w-60">
+              Tender agency name :
+            </label>
+            <p>{filedata.tender_agency_name}</p>
           </div>
 
           {filedata.remarks && (

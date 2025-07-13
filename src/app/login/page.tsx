@@ -146,6 +146,7 @@ const LoginPage = () => {
                 prefix={<FluentKey16Filled className="text-gray-400 text-lg" />}
                 variant="outlined"
                 placeholder="Password"
+                type={isShow ? "text" : "password"}
                 suffix={
                   isShow ? (
                     <Fa6RegularEyeSlash onClick={() => setShow(false)} />

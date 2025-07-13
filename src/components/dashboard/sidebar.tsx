@@ -49,7 +49,7 @@ const Sidebar = (props: SidebarProps) => {
       }  transition-transform duration-300 ease-in-out`}
     >
       <p className="text-xl font-semibold text-white text-center">
-        PDA DNH
+        SMC
       </p>
       <div className="h-4"></div>
 

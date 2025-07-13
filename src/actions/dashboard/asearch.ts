@@ -1,21 +1,18 @@
 "use server";
 
 enum SearchType {
-  VILLAGE_USER,
+  VILLAGE_FILENAME,
   VILLAGE_SURVAY,
   FILETYPE_VILLAGE,
-  FILETYPE_USER,
-  FILETEYPE_YEAR,
-  VILLAGE_YEAR,
+  FILETYPE_FILENAME,
 }
 
 interface ASearchFilePayload {
   searchtype: SearchType;
   file_no?: string;
   file_id?: string;
-  applicant_name?: string;
+  file_name?: string;
   survey_number?: string;
-  year?: string;
   remarks?: string;
   typeId?: number;
   villageId?: number;
@@ -31,23 +28,6 @@ const ASearchFile = async (
 ): Promise<ApiResponseType<file[] | null>> => {
   try {
     let files: file[] = [];
-    // year search
-    if (payload.year) {
-      const year = await prisma.file.findMany({
-        where: {
-          deletedAt: null,
-          year: payload.year,
-        },
-        include: {
-          village: true,
-          file_type: true,
-        },
-      });
-
-      if (year) {
-        files = [...files, ...year];
-      }
-    }
 
     // file number search
     if (payload.file_no) {
@@ -143,12 +123,12 @@ const ASearchFile = async (
 
     // search name
 
-    if (payload.applicant_name) {
+    if (payload.file_name) {
       const filename = await prisma.file.findMany({
         where: {
           deletedAt: null,
           filename: {
-            contains: payload.applicant_name,
+            contains: payload.file_name,
           },
         },
         include: {
@@ -161,96 +141,31 @@ const ASearchFile = async (
         files = [...files, ...filename];
       }
 
-      const name = await prisma.file_name.findMany({
-        where: {
-          deletedAt: null,
-          name: {
-            contains: payload.applicant_name,
-          },
-        },
-        include: {
-          file: {
-            include: {
-              village: true,
-              file_type: true,
-            },
-          },
-        },
-      });
-      if (name) {
-        files = [...files, ...name.map((n) => n.file)];
-      }
+      files = [...files];
     }
 
     // search survey number
     if (payload.survey_number) {
-      const surveyfiles = await prisma.file_survey.findMany({
+      const survey = await prisma.file.findMany({
         where: {
           deletedAt: null,
-          survey_number: {
+          survey_no: {
             contains: payload.survey_number,
-          },
-        },
-        include: {
-          file: {
-            include: {
-              village: true,
-              file_type: true,
-            },
-          },
-        },
-      });
-
-      if (surveyfiles) {
-        files = [...files, ...surveyfiles.map((s) => s.file)];
-      }
-
-      const survey = await prisma.file_survey.findMany({
-        where: {
-          deletedAt: null,
-          survey_number: {
-            contains: payload.survey_number,
-          },
-        },
-        include: {
-          file: {
-            include: {
-              village: true,
-              file_type: true,
-            },
           },
         },
       });
 
       if (survey) {
-        files = [...files, ...survey.map((s) => s.file)];
+        files = [...files, ...survey];
       }
     }
 
-    if (payload.searchtype == SearchType.FILETYPE_USER) {
-      // done
-      const search_files = await prisma.file_name.findMany({
-        where: {
-          deletedAt: null,
-          name: {
-            contains: payload.applicant_name,
-          },
-        },
-        include: {
-          file: {
-            include: {
-              file_type: true,
-              village: true,
-            },
-          },
-        },
-      });
-
+    if (payload.searchtype == SearchType.FILETYPE_FILENAME) {
       const search_files2 = await prisma.file.findMany({
         where: {
           deletedAt: null,
           filename: {
-            contains: payload.applicant_name,
+            contains: payload.file_name,
           },
         },
         include: {
@@ -259,10 +174,7 @@ const ASearchFile = async (
         },
       });
 
-      const all_search_file = [
-        ...search_files2,
-        ...search_files.map((f) => f.file),
-      ];
+      const all_search_file = [...search_files2];
 
       files = all_search_file.filter((f) => f.file_typeId == payload.typeId);
     } else if (payload.searchtype == SearchType.FILETYPE_VILLAGE) {
@@ -271,30 +183,12 @@ const ASearchFile = async (
         (f) =>
           f.file_typeId == payload.typeId && f.villageId == payload.villageId
       );
-    } else if (payload.searchtype == SearchType.VILLAGE_USER) {
-      // done
-      const search_files = await prisma.file_name.findMany({
-        where: {
-          deletedAt: null,
-          name: {
-            contains: payload.applicant_name,
-          },
-        },
-        include: {
-          file: {
-            include: {
-              file_type: true,
-              village: true,
-            },
-          },
-        },
-      });
-
+    } else if (payload.searchtype == SearchType.VILLAGE_FILENAME) {
       const search_files2 = await prisma.file.findMany({
         where: {
           deletedAt: null,
           filename: {
-            contains: payload.applicant_name,
+            contains: payload.file_name,
           },
         },
         include: {
@@ -302,29 +196,10 @@ const ASearchFile = async (
           village: true,
         },
       });
-      const all_search_file = [
-        ...search_files2,
-        ...search_files.map((f) => f.file),
-      ];
+      const all_search_file = [...search_files2];
 
       files = all_search_file.filter((f) => f.villageId == payload.villageId);
     } else if (payload.searchtype == SearchType.VILLAGE_SURVAY) {
-      // done
-      const search_files = await prisma.file_survey.findMany({
-        where: {
-          deletedAt: null,
-          survey_number: payload.survey_number,
-        },
-        include: {
-          file: {
-            include: {
-              file_type: true,
-              village: true,
-            },
-          },
-        },
-      });
-
       const search_files2 = await prisma.file.findMany({
         where: {
           deletedAt: null,
@@ -335,22 +210,9 @@ const ASearchFile = async (
           village: true,
         },
       });
-      const all_search_file = [
-        ...search_files2,
-        ...search_files.map((f) => f.file),
-      ];
+      const all_search_file = [...search_files2];
 
       files = all_search_file.filter((f) => f.villageId == payload.villageId);
-    } else if (payload.searchtype == SearchType.VILLAGE_YEAR) {
-      // done
-      files = files.filter(
-        (f) => f.villageId == payload.villageId && f.year == payload.year
-      );
-    } else if (payload.searchtype == SearchType.FILETEYPE_YEAR) {
-      // done
-      files = files.filter(
-        (f) => f.file_typeId == payload.typeId && f.year == payload.year
-      );
     }
 
     files = files.filter(

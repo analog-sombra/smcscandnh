@@ -37,12 +37,12 @@ const ASearch = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
   enum SearchType {
-    VILLAGE_USER,
+    VILLAGE_FILENAME,
     VILLAGE_SURVAY,
     FILETYPE_VILLAGE,
-    FILETYPE_USER,
-    FILETEYPE_YEAR,
-    VILLAGE_YEAR,
+    FILETYPE_FILENAME,
+    // FILETEYPE_YEAR,
+    // VILLAGE_YEAR,
   }
   const [isLoading, setLoading] = useState<boolean>(true);
   const [villages, setVillages] = useState<village[]>([]);
@@ -54,7 +54,7 @@ const ASearch = () => {
   const pagination = usePagination(searchData);
 
   const [searchtype, setSearchType] = useState<SearchType>(
-    SearchType.FILETEYPE_YEAR
+    SearchType.VILLAGE_FILENAME
   );
 
   useEffect(() => {
@@ -78,32 +78,29 @@ const ASearch = () => {
   const [fileType, setFileType] = useState<number>(0);
   const [village, setVillage] = useState<number>(0);
 
-  const applicant_name = useRef<HTMLInputElement>(null);
+  const file_name = useRef<HTMLInputElement>(null);
   const survey = useRef<HTMLInputElement>(null);
   const year = useRef<HTMLInputElement>(null);
 
   const searchItems = async () => {
     setIsSearching(true);
-    if (searchtype === SearchType.VILLAGE_USER) {
+    if (searchtype === SearchType.VILLAGE_FILENAME) {
       if (!village || village === 0) {
         toast.error("Village is required");
         setIsSearching(false);
         return;
       }
-      if (
-        !applicant_name.current?.value ||
-        applicant_name.current?.value === ""
-      ) {
-        toast.error("Applicant name is required");
+      if (!file_name.current?.value || file_name.current?.value === "") {
+        toast.error("File title is required");
         setIsSearching(false);
 
         return;
       }
 
       const filesearch: ApiResponseType<file[] | null> = await ASearchFile({
-        applicant_name: applicant_name.current?.value,
+        file_name: file_name.current?.value,
         villageId: village,
-        searchtype: SearchType.VILLAGE_USER,
+        searchtype: SearchType.VILLAGE_FILENAME,
       });
 
       if (filesearch.status) {
@@ -166,39 +163,9 @@ const ASearch = () => {
       } else {
         toast.error(filesearch.message);
       }
-    } else if (searchtype === SearchType.FILETEYPE_YEAR) {
-      if (!year.current?.value || year.current?.value === "") {
-        toast.error("Year is required");
-        setIsSearching(false);
-
-        return;
-      }
-
-      if (!fileType || fileType === 0) {
-        toast.error("File Type is required");
-        setIsSearching(false);
-
-        return;
-      }
-
-      const filesearch: ApiResponseType<file[] | null> = await ASearchFile({
-        year: year.current?.value,
-        typeId: fileType,
-        searchtype: SearchType.FILETEYPE_YEAR,
-      });
-      if (filesearch.status) {
-        setSearchData(filesearch.data!);
-        setSearch(true);
-        toast.success("File search completed");
-      } else {
-        toast.error(filesearch.message);
-      }
-    } else if (searchtype === SearchType.FILETYPE_USER) {
-      if (
-        !applicant_name.current?.value ||
-        applicant_name.current?.value === ""
-      ) {
-        toast.error("Applicant name is required");
+    } else if (searchtype === SearchType.FILETYPE_FILENAME) {
+      if (!file_name.current?.value || file_name.current?.value === "") {
+        toast.error("File title is required");
         setIsSearching(false);
 
         return;
@@ -211,36 +178,9 @@ const ASearch = () => {
       }
 
       const filesearch: ApiResponseType<file[] | null> = await ASearchFile({
-        applicant_name: applicant_name.current?.value,
+        file_name: file_name.current?.value,
         typeId: fileType,
-        searchtype: SearchType.FILETYPE_USER,
-      });
-
-      if (filesearch.status) {
-        setSearchData(filesearch.data!);
-        setSearch(true);
-        toast.success("File search completed");
-      } else {
-        toast.error(filesearch.message);
-      }
-    } else if (searchtype === SearchType.VILLAGE_YEAR) {
-      if (!year.current?.value || year.current?.value === "") {
-        toast.error("Year is required");
-        setIsSearching(false);
-
-        return;
-      }
-      if (!village || village === 0) {
-        toast.error("Village is required");
-        setIsSearching(false);
-
-        return;
-      }
-
-      const filesearch: ApiResponseType<file[] | null> = await ASearchFile({
-        year: year.current?.value,
-        villageId: village,
-        searchtype: SearchType.VILLAGE_YEAR,
+        searchtype: SearchType.FILETYPE_FILENAME,
       });
 
       if (filesearch.status) {
@@ -268,13 +208,13 @@ const ASearch = () => {
         setSearchresult(
           searchData.filter(
             (property) =>
-              property.applicant_name
+              property.filename
                 .toString()
                 .toLowerCase()
                 .includes(
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
-              property.survey_number
+              property.survey_no
                 .toString()
                 .toLowerCase()
                 .includes(
@@ -286,7 +226,7 @@ const ASearch = () => {
                 .includes(
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
-              property.type.name
+              property.file_type.name
                 .toString()
                 .toLowerCase()
                 .includes(
@@ -332,11 +272,8 @@ const ASearch = () => {
             <div className="w-full">
               <Select
                 onValueChange={(val) => {
-                  if (val == SearchType.FILETEYPE_YEAR.toString()) {
-                    setSearchType(SearchType.FILETEYPE_YEAR);
-                  }
-                  if (val == SearchType.VILLAGE_USER.toString()) {
-                    setSearchType(SearchType.VILLAGE_USER);
+                  if (val == SearchType.VILLAGE_FILENAME.toString()) {
+                    setSearchType(SearchType.VILLAGE_FILENAME);
                   }
                   if (val == SearchType.VILLAGE_SURVAY.toString()) {
                     setSearchType(SearchType.VILLAGE_SURVAY);
@@ -344,11 +281,8 @@ const ASearch = () => {
                   if (val == SearchType.FILETYPE_VILLAGE.toString()) {
                     setSearchType(SearchType.FILETYPE_VILLAGE);
                   }
-                  if (val == SearchType.FILETYPE_USER.toString()) {
-                    setSearchType(SearchType.FILETYPE_USER);
-                  }
-                  if (val == SearchType.VILLAGE_YEAR.toString()) {
-                    setSearchType(SearchType.VILLAGE_YEAR);
+                  if (val == SearchType.FILETYPE_FILENAME.toString()) {
+                    setSearchType(SearchType.FILETYPE_FILENAME);
                   }
                 }}
               >
@@ -358,11 +292,9 @@ const ASearch = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Search Type</SelectLabel>
-                    <SelectItem value={SearchType.FILETEYPE_YEAR.toString()}>
-                      File Type/Year
-                    </SelectItem>
-                    <SelectItem value={SearchType.VILLAGE_USER.toString()}>
-                      Village/Applicant Name
+
+                    <SelectItem value={SearchType.VILLAGE_FILENAME.toString()}>
+                      Village/File Title
                     </SelectItem>
                     <SelectItem value={SearchType.VILLAGE_SURVAY.toString()}>
                       Village/Survey
@@ -370,11 +302,8 @@ const ASearch = () => {
                     <SelectItem value={SearchType.FILETYPE_VILLAGE.toString()}>
                       File Type/Village
                     </SelectItem>
-                    <SelectItem value={SearchType.FILETYPE_USER.toString()}>
-                      File Type/Applicant Name
-                    </SelectItem>
-                    <SelectItem value={SearchType.VILLAGE_YEAR.toString()}>
-                      Village/Year
+                    <SelectItem value={SearchType.FILETYPE_FILENAME.toString()}>
+                      File Type/File Title
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -383,8 +312,7 @@ const ASearch = () => {
           </div>
 
           {searchtype === SearchType.FILETYPE_VILLAGE ||
-          searchtype == SearchType.FILETEYPE_YEAR ||
-          searchtype == SearchType.FILETYPE_USER ? (
+          searchtype == SearchType.FILETYPE_FILENAME ? (
             <div className="flex gap-2 items-center mt-4">
               <label htmlFor="fileid" className="w-44 text-right">
                 File Type :
@@ -414,9 +342,8 @@ const ASearch = () => {
           )}
 
           {searchtype === SearchType.VILLAGE_SURVAY ||
-          searchtype == SearchType.VILLAGE_USER ||
-          searchtype == SearchType.FILETYPE_VILLAGE ||
-          searchtype == SearchType.VILLAGE_YEAR ? (
+          searchtype == SearchType.VILLAGE_FILENAME ||
+          searchtype == SearchType.FILETYPE_VILLAGE ? (
             <div className="flex gap-2 items-center mt-4">
               <label htmlFor="fileid" className="w-44 text-right">
                 Village :
@@ -458,35 +385,17 @@ const ASearch = () => {
             </div>
           )}
 
-          {searchtype === SearchType.VILLAGE_USER ||
-          searchtype === SearchType.FILETYPE_USER ? (
+          {searchtype === SearchType.VILLAGE_FILENAME ||
+          searchtype === SearchType.FILETYPE_FILENAME ? (
             <div className="flex gap-2 items-center  mt-4">
               <label htmlFor="name" className="w-44 text-right">
-                Applicant Name :
+                File Title :
               </label>
               <Input
-                placeholder="Enter Applicant Name"
-                id="applicant_name"
-                name="applicant_name"
-                ref={applicant_name}
-              />
-            </div>
-          ) : (
-            <></>
-          )}
-
-          {searchtype === SearchType.FILETEYPE_YEAR ||
-          searchtype == SearchType.VILLAGE_YEAR ? (
-            <div className="flex gap-2 items-center  mt-4">
-              <label htmlFor="year" className="w-44 text-right">
-                Year :
-              </label>
-              <Input
-                placeholder="Select Year"
-                id="year"
-                name="year"
-                ref={year}
-                onChange={handleNumberChange}
+                placeholder="Enter File title"
+                id="file_name"
+                name="file_name"
+                ref={file_name}
               />
             </div>
           ) : (

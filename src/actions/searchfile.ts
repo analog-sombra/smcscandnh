@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 interface SearchFilePayload {
-  file_no?: string;
-  file_id?: string;
-  applicant_name?: string;
-  survey_number?: string;
-  year?: string;
-  remarks?: string;
   typeId?: number;
   villageId?: number;
-  file_ref?: string;
-  dates?: string;
+  file_id?: string;
+  file_title?: string;
+  old_file_no?: string;
+  fts_no?: string;
+  file_name?: string;
+  survey?: string;
+  plot?: string;
 }
 
 import { errorToString } from "@/utils/methods";
@@ -44,41 +43,9 @@ const fileSearch = async (
       };
     }
 
-    const filenameresponse = await prisma.file_name.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-
-    if (!filenameresponse) {
-      return {
-        status: false,
-        data: null,
-        message: "Unable to get files names",
-        functionname: "MatchSearch",
-      };
-    }
-
-    const filesurveyresponse = await prisma.file_survey.findMany({
-      where: {
-        deletedAt: null,
-      },
-    });
-
-    if (!filesurveyresponse) {
-      return {
-        status: false,
-        data: null,
-        message: "Unable to get files survey",
-        functionname: "MatchSearch",
-      };
-    }
-
     files = fileresponse.map((file: any) => {
       const file_survery = file.survey_number;
-      const applicant_name = file.applicant_name;
       file.survey_number = [file_survery];
-      file.applicant_name = [applicant_name];
 
       return file;
     });
@@ -88,89 +55,118 @@ const fileSearch = async (
     // Populate the map with the files
     files.forEach((file) => fileMap.set(file.id, file));
 
-    for (let i = 0; i < filenameresponse.length; i++) {
-      const file_id = filenameresponse[i].fileId;
-      const applicant_name = filenameresponse[i].name;
-
-      const file = fileMap.get(file_id);
-      if (file) {
-        file.applicant_name.push(applicant_name);
-      }
-    }
-
-    for (let i = 0; i < filesurveyresponse.length; i++) {
-      const file_id = filesurveyresponse[i].fileId;
-      const survey_number = filesurveyresponse[i].survey_number;
-
-      const file = fileMap.get(file_id);
-      if (file) {
-        file.survey_number.push(survey_number);
-      }
-    }
-
     files = Array.from(fileMap.values());
 
     for (let i = 0; i < files.length; i++) {
-      files[i].applicant_name = files[i].applicant_name.join(", ");
       files[i].survey_number = files[i].survey_number.join(", ");
     }
 
     // -------------------------------------------------------
 
+    console.log(files.length, "files length");
+    console.log(payload, "payload length");
+
     // check file id
     if (payload.typeId) {
-      files = files.filter((file: any) => file.typeId == payload.typeId);
+      files = files.filter((file: any) => file.file_typeId == payload.typeId);
     }
+    console.log(files.length, "files length");
     // check village id
     if (payload.villageId) {
       files = files.filter((file: any) => file.villageId == payload.villageId);
     }
 
     // check year
-    if (payload.year) {
-      files = files.filter((file: any) => file.year == payload.year);
-    }
+    // if (payload.file_name) {
+    //   files = files.filter((file: any) => file.filename == payload.file_name);
+    // }
 
     // check file id
     if (payload.file_id) {
-      files = files.filter((file: any) => file.file_id == payload.file_id);
+      files = files.filter((file: any) => file.fileid == payload.file_id);
     }
 
-    // check file no
-    if (payload.file_no) {
-      files = files.filter((file: any) => file.file_no == payload.file_no);
-    }
+    // // check file no
+    // if (payload.file_no) {
+    //   files = files.filter((file: any) => file.file_no == payload.file_no);
+    // }
 
-    // check file ref
-    if (payload.file_ref) {
-      files = files.filter((file: any) => file.file_ref == payload.file_ref);
-    }
+    // // check file ref
+    // if (payload.file_ref) {
+    //   files = files.filter((file: any) => file.file_ref == payload.file_ref);
+    // }
 
-    if (payload.survey_number) {
+    if (payload.survey) {
       const fuse = new Fuse(files, {
         isCaseSensitive: false,
         threshold: 0.2,
-        keys: ["survey_number"],
+        keys: ["survey_no"],
       });
-      const searchresult = fuse.search(payload.survey_number);
+      const searchresult = fuse.search(payload.survey);
       files = searchresult.map((result: any) => result.item);
     }
 
-    if (payload.applicant_name) {
+    if (payload.plot) {
       const fuse = new Fuse(files, {
         isCaseSensitive: false,
         threshold: 0.2,
-        keys: ["applicant_name"],
+        keys: ["plot_no"],
       });
-      const searchresult = fuse.search(payload.applicant_name);
+      const searchresult = fuse.search(payload.plot);
       files = searchresult.map((result: any) => result.item);
     }
+
+    // if (payload.file_id) {
+    //   const fuse = new Fuse(files, {
+    //     isCaseSensitive: false,
+    //     threshold: 0.2,
+    //     keys: ["fileid"],
+    //   });
+    //   const searchresult = fuse.search(payload.file_id);
+    //   files = searchresult.map((result: any) => result.item);
+    // }
+    if (payload.file_title) {
+      const fuse = new Fuse(files, {
+        isCaseSensitive: false,
+        threshold: 0.2,
+        keys: ["file_no"],
+      });
+      const searchresult = fuse.search(payload.file_title);
+      files = searchresult.map((result: any) => result.item);
+    }
+    if (payload.file_name) {
+      const fuse = new Fuse(files, {
+        isCaseSensitive: false,
+        threshold: 0.2,
+        keys: ["filename"],
+      });
+      const searchresult = fuse.search(payload.file_name);
+      files = searchresult.map((result: any) => result.item);
+    }
+    if (payload.old_file_no) {
+      const fuse = new Fuse(files, {
+        isCaseSensitive: false,
+        threshold: 0.2,
+        keys: ["old_file_no"],
+      });
+      const searchresult = fuse.search(payload.old_file_no);
+      files = searchresult.map((result: any) => result.item);
+    }
+    if (payload.fts_no) {
+      const fuse = new Fuse(files, {
+        isCaseSensitive: false,
+        threshold: 0.2,
+        keys: ["fts_no"],
+      });
+      const searchresult = fuse.search(payload.fts_no);
+      files = searchresult.map((result: any) => result.item);
+    }
+
+    console.log("files", files);
 
     files = files.map((file: any) => {
       const file_survery = file.survey_number;
-      const applicant_name = file.applicant_name;
       file.survey_number = file_survery.split(", ")[0];
-      file.applicant_name = applicant_name.split(", ")[0];
       return file;
     });
 

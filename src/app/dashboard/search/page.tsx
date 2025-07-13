@@ -66,11 +66,16 @@ const Search = () => {
   const [village, setVillage] = useState<number>(0);
 
   const file_id = useRef<HTMLInputElement>(null);
-  const file_no = useRef<HTMLInputElement>(null);
-  const applicant_name = useRef<HTMLInputElement>(null);
+  const file_title = useRef<HTMLInputElement>(null);
+  const old_file_no = useRef<HTMLInputElement>(null);
+  const fts_no = useRef<HTMLInputElement>(null);
+  const file_name = useRef<HTMLInputElement>(null);
   const survey = useRef<HTMLInputElement>(null);
-  const year = useRef<HTMLInputElement>(null);
-  const fileref = useRef<HTMLInputElement>(null);
+  const plot = useRef<HTMLInputElement>(null);
+
+  // const file_no = useRef<HTMLInputElement>(null);
+  // const year = useRef<HTMLInputElement>(null);
+  // const fileref = useRef<HTMLInputElement>(null);
   // const remark = useRef<HTMLTextAreaElement>(null);
   // const villageRef = useRef<HTMLSelectElement>(null);
   // const typeRef = useRef<HTMLSelectElement>(null);
@@ -81,11 +86,12 @@ const Search = () => {
       fileType === 0 &&
       village === 0 &&
       !file_id.current?.value &&
-      !file_no.current?.value &&
-      !applicant_name.current?.value &&
+      !file_title.current?.value &&
+      !file_name.current?.value &&
       !survey.current?.value &&
-      !year.current?.value &&
-      !fileref.current?.value
+      !plot.current?.value &&
+      !fts_no.current?.value &&
+      !old_file_no.current?.value
     ) {
       toast.error("Please enter any search criteria");
       setIsSearching(false);
@@ -93,23 +99,39 @@ const Search = () => {
     }
 
     const filesearch: ApiResponseType<file[] | null> = await fileSearch({
-      file_no:
-        file_no.current?.value == "" ? undefined : file_no.current?.value,
-      file_id:
-        file_id.current?.value == "" ? undefined : file_id.current?.value,
-      applicant_name:
-        applicant_name.current?.value == ""
-          ? undefined
-          : applicant_name.current?.value,
-      survey_number:
-        survey.current?.value == "" ? undefined : survey.current?.value,
-      year: year.current?.value == "" ? undefined : year.current?.value,
+      // file_no:
+      //   file_no.current?.value == "" ? undefined : file_no.current?.value,
+      // file_id:
+      //   file_id.current?.value == "" ? undefined : file_id.current?.value,
+      // applicant_name:
+      //   applicant_name.current?.value == ""
+      //     ? undefined
+      //     : applicant_name.current?.value,
+      // survey_number:
+      //   survey.current?.value == "" ? undefined : survey.current?.value,
+      // year: year.current?.value == "" ? undefined : year.current?.value,
+      // typeId: fileType == 0 ? undefined : fileType,
+      // villageId: village == 0 ? undefined : village,
+      // file_ref:
+      //   fileref.current?.value == "" ? undefined : fileref.current?.value,
       typeId: fileType == 0 ? undefined : fileType,
       villageId: village == 0 ? undefined : village,
-      file_ref:
-        fileref.current?.value == "" ? undefined : fileref.current?.value,
+      file_id:
+        file_id.current?.value == "" ? undefined : file_id.current?.value,
+      file_title:
+        file_title.current?.value == "" ? undefined : file_title.current?.value,
+      old_file_no:
+        old_file_no.current?.value == ""
+          ? undefined
+          : old_file_no.current?.value,
+      fts_no: fts_no.current?.value == "" ? undefined : fts_no.current?.value,
+      file_name:
+        file_name.current?.value == "" ? undefined : file_name.current?.value,
+      survey: survey.current?.value == "" ? undefined : survey.current?.value,
+      plot: plot.current?.value == "" ? undefined : plot.current?.value,
     });
 
+    console.log(filesearch);
     if (filesearch.status) {
       setSearchData(filesearch.data!);
       setSearch(true);
@@ -141,25 +163,49 @@ const Search = () => {
         setSearchresult(
           searchData.filter(
             (property) =>
-              property.applicant_name
+              property.fileid
                 .toString()
                 .toLowerCase()
                 .includes(
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
-              property.survey_number
+              property.file_no
                 .toString()
                 .toLowerCase()
                 .includes(
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
-              property.year
+              property.filename
                 .toString()
                 .toLowerCase()
                 .includes(
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
-              property.type.name
+              property.old_file_no
+                .toString()
+                .toLowerCase()
+                .includes(
+                  searchRef.current?.value.toString().toLowerCase() ?? ""
+                ) ||
+              property.fts_no
+                .toString()
+                .toLowerCase()
+                .includes(
+                  searchRef.current?.value.toString().toLowerCase() ?? ""
+                ) ||
+              property.plot_no
+                .toString()
+                .toLowerCase()
+                .includes(
+                  searchRef.current?.value.toString().toLowerCase() ?? ""
+                ) ||
+              property.survey_no
+                .toString()
+                .toLowerCase()
+                .includes(
+                  searchRef.current?.value.toString().toLowerCase() ?? ""
+                ) ||
+              property.file_type.name
                 .toString()
                 .toLowerCase()
                 .includes(
@@ -192,12 +238,23 @@ const Search = () => {
     );
 
   return (
-    <div className="min-h-screen p-6 mx-auto">
-      <Card className=" h-full p-2 mt-4 px-6">
+    <div className="min-h-screen p-4 mx-auto">
+      <Card className=" h-full p-2 px-6">
         <h1 className="text-center text-2xl font-medium">
           Search File Details
         </h1>
-
+        <div className="flex gap-2 items-center mt-4">
+          <label htmlFor="file_id" className="w-60">
+            File Id :
+          </label>
+          <Input
+            placeholder="Enter New File ID"
+            id="file_id"
+            name="file_id"
+            ref={file_id}
+            className="placeholder:text-gray-300"
+          />
+        </div>
         <div className="flex gap-2 items-center mt-4">
           <label htmlFor="fileid" className="w-60">
             File Type :
@@ -222,18 +279,33 @@ const Search = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex gap-2 items-center mt-4">
-          <label htmlFor="file_id" className="w-60">
-            New File Id :
+        <div className="flex gap-2 items-center  mt-4">
+          <label htmlFor="year" className="w-60">
+            File Title :
           </label>
           <Input
-            placeholder="Enter New File ID"
-            id="file_id"
-            name="file_id"
-            ref={file_id}
+            onChange={handleNumberChange}
+            placeholder="File Title"
+            id="file_title"
+            name="file_title"
+            ref={file_title}
             className="placeholder:text-gray-300"
           />
         </div>
+
+        <div className="flex gap-2 items-center mt-4">
+          <label htmlFor="fileref" className="w-60">
+            File Name :
+          </label>
+          <Input
+            placeholder="File Name"
+            id="file_name"
+            name="file_name"
+            ref={file_name}
+            className="placeholder:text-gray-300"
+          />
+        </div>
+
         <div className="flex gap-2 items-center mt-4">
           <label htmlFor="file_no" className="w-60">
             Old File No :
@@ -242,7 +314,19 @@ const Search = () => {
             placeholder="Enter Old File No"
             id="file_no"
             name="file_no"
-            ref={file_no}
+            ref={old_file_no}
+            className="placeholder:text-gray-300"
+          />
+        </div>
+        <div className="flex gap-2 items-center mt-4">
+          <label htmlFor="file_no" className="w-60">
+            FTS No :
+          </label>
+          <Input
+            placeholder="Enter FTS No"
+            id="fts_no"
+            name="fts_no"
+            ref={fts_no}
             className="placeholder:text-gray-300"
           />
         </div>
@@ -284,43 +368,17 @@ const Search = () => {
         </div>
         <div className="flex gap-2 items-center  mt-4">
           <label htmlFor="name" className="w-60">
-            Name :
+            Plot :
           </label>
           <Input
-            placeholder="Enter Name"
-            id="applicant_name"
-            name="applicant_name"
-            ref={applicant_name}
+            placeholder="Enter Plot"
+            id="plot"
+            name="plot"
+            ref={plot}
             className="placeholder:text-gray-300"
           />
         </div>
 
-        <div className="flex gap-2 items-center  mt-4">
-          <label htmlFor="year" className="w-60">
-            Year :
-          </label>
-          <Input
-            onChange={handleNumberChange}
-            placeholder="Year"
-            id="year"
-            name="year"
-            ref={year}
-            className="placeholder:text-gray-300"
-          />
-        </div>
-
-        <div className="flex gap-2 items-center mt-4">
-          <label htmlFor="fileref" className="w-60">
-            File ref :
-          </label>
-          <Input
-            placeholder="File Reference Number"
-            id="fileref"
-            name="fileref"
-            ref={fileref}
-            className="placeholder:text-gray-300"
-          />
-        </div>
         <div className="flex gap-4">
           <div className="grow"></div>
           <Button
@@ -374,9 +432,9 @@ const Search = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">File Id</TableHead>
-                    <TableHead>Name</TableHead>
+                    <TableHead>File Name</TableHead>
                     <TableHead>Survey Number</TableHead>
-                    <TableHead>Year</TableHead>
+                    <TableHead>File Title</TableHead>
                     <TableHead>File Type</TableHead>
                     <TableHead>Village</TableHead>
                     <TableHead>Action</TableHead>
@@ -386,12 +444,12 @@ const Search = () => {
                   {paginationsearch.paginatedItems.map((val: any) => (
                     <TableRow key={val.id}>
                       <TableCell className="font-medium">
-                        {val.file_id}
+                        {val.fileid}
                       </TableCell>
-                      <TableCell>{val.applicant_name}</TableCell>
-                      <TableCell>{val.survey_number}</TableCell>
-                      <TableCell>{val.year}</TableCell>
-                      <TableCell>{val.type.name}</TableCell>
+                      <TableCell>{val.filename}</TableCell>
+                      <TableCell>{val.survey_no ?? "NA"}</TableCell>
+                      <TableCell>{val.file_no}</TableCell>
+                      <TableCell>{val.file_type.name}</TableCell>
                       <TableCell>{val.village.name}</TableCell>
                       <TableCell>
                         <Link
@@ -418,9 +476,9 @@ const Search = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">File Id</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>File Name</TableHead>
                   <TableHead>Survey Number</TableHead>
-                  <TableHead>Year</TableHead>
+                  <TableHead>File Title</TableHead>
                   <TableHead>File Type</TableHead>
                   <TableHead>Village</TableHead>
                   <TableHead>Action</TableHead>
@@ -429,11 +487,11 @@ const Search = () => {
               <TableBody>
                 {pagination.paginatedItems.map((val: any) => (
                   <TableRow key={val.id}>
-                    <TableCell className="font-medium">{val.file_id}</TableCell>
-                    <TableCell>{val.applicant_name}</TableCell>
-                    <TableCell>{val.survey_number}</TableCell>
-                    <TableCell>{val.year}</TableCell>
-                    <TableCell>{val.type.name}</TableCell>
+                    <TableCell className="font-medium">{val.fileid}</TableCell>
+                    <TableCell>{val.filename}</TableCell>
+                    <TableCell>{val.survey_no ?? "NA"}</TableCell>
+                    <TableCell>{val.file_no}</TableCell>
+                    <TableCell>{val.file_type.name}</TableCell>
                     <TableCell>{val.village.name}</TableCell>
                     <TableCell>
                       <Link
