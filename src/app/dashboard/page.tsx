@@ -148,25 +148,6 @@ const Dashboard = () => {
     init();
   }, []);
 
-  const yearsearch = async (year: string) => {
-    const filesearch: ApiResponseType<file[] | null> = await fileSearch({
-      year: year,
-    });
-
-    if (filesearch.status) {
-      setSearchData(filesearch.data!);
-      setSearch(true);
-      setTimeout(() => {
-        window.scrollTo({
-          top: 800,
-          behavior: "smooth",
-        });
-      }, 200);
-    } else {
-      toast.error(filesearch.message);
-    }
-  };
-
   const villagesearch = async (villageid: number) => {
     const filesearch: ApiResponseType<file[] | null> = await fileSearch({
       villageId: villageid,
