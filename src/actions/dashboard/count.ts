@@ -10,9 +10,21 @@ const DashBoardCount = async (
   payload: DashBoardCountPayload
 ): Promise<ApiResponseType<{ [key: string]: number } | null>> => {
   try {
-    const villagecout = await prisma.village.count();
-    const typecout = await prisma.file_type.count();
-    const filecout = await prisma.file.count();
+    const villagecout = await prisma.village.count({
+      where: {
+        deletedAt: null,
+      },
+    });
+    const typecout = await prisma.file_type.count({
+      where: {
+        deletedAt: null,
+      },
+    });
+    const filecout = await prisma.file.count({
+      where: {
+        deletedAt: null,
+      },
+    });
 
     const files = await prisma.file.findMany({
       where: {

@@ -403,7 +403,7 @@ const Dashboard = () => {
         </div> */}
         <div className="flex-1 bg-white p-2 rounded col-span-3 relative">
           <h3 className="text-lg bg-white text-center">
-            Villages & File Count
+            Department vs File Count
           </h3>
           <div className="w-full h-[1px] bg-gray-200 mt-1"></div>
           <Table className="relative w-full">
@@ -420,23 +420,29 @@ const Dashboard = () => {
           <div className="max-h-[360px] overflow-y-scroll">
             <Table className="relative w-full">
               <TableBody className="">
-                {departmentFile.map((department: any, index: number) => (
-                  <TableRow
-                    key={index}
-                    // onClick={() => departmentsearch(department.id)}
-                    className="cursor-pointer hover:bg-gray-100"
-                  >
-                    <TableCell className="font-medium p-1 w-[20px]">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell className="p-1 w-40">
-                      {department.name}
-                    </TableCell>
-                    <TableCell className="p-1 text-right w-28">
-                      {department.filecount}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {departmentFile
+                  .sort((a: any, b: any) => {
+                    if (a.filecount > b.filecount) return -1;
+                    if (a.filecount < b.filecount) return 1;
+                    return 0;
+                  })
+                  .map((department: any, index: number) => (
+                    <TableRow
+                      key={index}
+                      // onClick={() => departmentsearch(department.id)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell className="font-medium p-1 w-[20px]">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="p-1 w-40">
+                        {department.name}
+                      </TableCell>
+                      <TableCell className="p-1 text-right w-28">
+                        {department.filecount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -460,6 +466,11 @@ const Dashboard = () => {
               <TableBody className="">
                 {typeFile
                   .filter((types: any) => types.id !== 11)
+                  .sort((a: any, b: any) => {
+                    if (a.filecount > b.filecount) return -1;
+                    if (a.filecount < b.filecount) return 1;
+                    return 0;
+                  })
                   .map((types: any, index: number) => (
                     <TableRow
                       key={types.id}
@@ -481,6 +492,145 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="grid grid-cols-6 gap-4 mt-4">
+        <div className="flex-1 bg-white p-2 rounded col-span-2">
+          <h3 className="text-lg text-center">
+            Engineering Department - File Count
+          </h3>
+          <div className="w-full h-[1px] bg-gray-200 mt-1"></div>
+          <Table className="relative">
+            <TableHeader className="">
+              <TableRow>
+                <TableHead className="w-[20px] p-1 h-8">No</TableHead>
+                <TableHead className="p-1 w-40 h-8">Name</TableHead>
+                <TableHead className="w-28 text-right bg p-1 h-8">
+                  File-count
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
+          <div className="max-h-[360px] overflow-y-scroll">
+            <Table className="relative">
+              <TableBody className="">
+                {typeFile
+                  .filter((types: any) =>
+                    [14, 3, 23, 19, 48, 15, 60, 49, 18, 16, 17, 56].includes(
+                      types.id
+                    )
+                  )
+                  .sort((a: any, b: any) => {
+                    if (a.filecount > b.filecount) return -1;
+                    if (a.filecount < b.filecount) return 1;
+                    return 0;
+                  })
+                  .map((types: any, index: number) => (
+                    <TableRow
+                      key={types.id}
+                      // onClick={() => filetypesearch(types.id)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell className="font-medium p-1">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="p-1">{types.name}</TableCell>
+                      <TableCell className="p-1 text-right">
+                        {types.filecount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+        <div className="flex-1 bg-white p-2 rounded col-span-2">
+          <h3 className="text-lg text-center">Tender Section - File Count</h3>
+          <div className="w-full h-[1px] bg-gray-200 mt-1"></div>
+          <Table className="relative">
+            <TableHeader className="">
+              <TableRow>
+                <TableHead className="w-[20px] p-1 h-8">No</TableHead>
+                <TableHead className="p-1 w-40 h-8">Name</TableHead>
+                <TableHead className="w-28 text-right bg p-1 h-8">
+                  File-count
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
+          <div className="max-h-[360px] overflow-y-scroll">
+            <Table className="relative">
+              <TableBody className="">
+                {typeFile
+                  .filter((types: any) =>
+                    [35, 36, 37, 38, 63, 40, 41].includes(types.id)
+                  )
+                  .sort((a: any, b: any) => {
+                    if (a.filecount > b.filecount) return -1;
+                    if (a.filecount < b.filecount) return 1;
+                    return 0;
+                  })
+                  .map((types: any, index: number) => (
+                    <TableRow
+                      key={types.id}
+                      // onClick={() => filetypesearch(types.id)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell className="font-medium p-1">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="p-1">{types.name}</TableCell>
+                      <TableCell className="p-1 text-right">
+                        {types.filecount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+        <div className="flex-1 bg-white p-2 rounded col-span-2">
+          <h3 className="text-lg text-center">Procurement - File Count</h3>
+          <div className="w-full h-[1px] bg-gray-200 mt-1"></div>
+          <Table className="relative">
+            <TableHeader className="">
+              <TableRow>
+                <TableHead className="w-[20px] p-1 h-8">No</TableHead>
+                <TableHead className="p-1 w-40 h-8">Name</TableHead>
+                <TableHead className="w-28 text-right bg p-1 h-8">
+                  File-count
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
+          <div className="max-h-[360px] overflow-y-scroll">
+            <Table className="relative">
+              <TableBody className="">
+                {typeFile
+                  .filter((types: any) => [59, 46, 47].includes(types.id))
+                  .sort((a: any, b: any) => {
+                    if (a.filecount > b.filecount) return -1;
+                    if (a.filecount < b.filecount) return 1;
+                    return 0;
+                  })
+                  .map((types: any, index: number) => (
+                    <TableRow
+                      key={types.id}
+                      // onClick={() => filetypesearch(types.id)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell className="font-medium p-1">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="p-1">{types.name}</TableCell>
+                      <TableCell className="p-1 text-right">
+                        {types.filecount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+      {/* <div className="grid grid-cols-6 gap-4 mt-4">
         <div className="flex-1 bg-white p-2 rounded col-span-6">
           <h3 className="text-lg text-center">Village & File Types</h3>
           <div className="w-full h-[1px] bg-gray-200 mt-1"></div>
@@ -536,7 +686,7 @@ const Dashboard = () => {
             </Table>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {search && (
         <Card className="mt-6">

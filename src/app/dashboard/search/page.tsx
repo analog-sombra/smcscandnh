@@ -68,6 +68,7 @@ const Search = () => {
   const file_id = useRef<HTMLInputElement>(null);
   const file_title = useRef<HTMLInputElement>(null);
   const old_file_no = useRef<HTMLInputElement>(null);
+  const subject = useRef<HTMLInputElement>(null);
   const fts_no = useRef<HTMLInputElement>(null);
   const file_name = useRef<HTMLInputElement>(null);
   const survey = useRef<HTMLInputElement>(null);
@@ -91,7 +92,8 @@ const Search = () => {
       !survey.current?.value &&
       !plot.current?.value &&
       !fts_no.current?.value &&
-      !old_file_no.current?.value
+      !old_file_no.current?.value &&
+      !subject.current?.value
     ) {
       toast.error("Please enter any search criteria");
       setIsSearching(false);
@@ -125,6 +127,8 @@ const Search = () => {
           ? undefined
           : old_file_no.current?.value,
       fts_no: fts_no.current?.value == "" ? undefined : fts_no.current?.value,
+      subject:
+        subject.current?.value == "" ? undefined : subject.current?.value,
       file_name:
         file_name.current?.value == "" ? undefined : file_name.current?.value,
       survey: survey.current?.value == "" ? undefined : survey.current?.value,
@@ -182,6 +186,12 @@ const Search = () => {
                   searchRef.current?.value.toString().toLowerCase() ?? ""
                 ) ||
               property.old_file_no
+                .toString()
+                .toLowerCase()
+                .includes(
+                  searchRef.current?.value.toString().toLowerCase() ?? ""
+                ) ||
+              property.subject
                 .toString()
                 .toLowerCase()
                 .includes(
@@ -318,6 +328,19 @@ const Search = () => {
             className="placeholder:text-gray-300"
           />
         </div>
+        <div className="flex gap-2 items-center mt-4">
+          <label htmlFor="subject" className="w-60">
+            Subject :
+          </label>
+          <Input
+            placeholder="Enter Subject"
+            id="subject"
+            name="subject"
+            ref={subject}
+            className="placeholder:text-gray-300"
+          />
+        </div>
+
         <div className="flex gap-2 items-center mt-4">
           <label htmlFor="file_no" className="w-60">
             FTS No :

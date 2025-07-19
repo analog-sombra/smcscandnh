@@ -14,6 +14,9 @@ const DepartmentFile = async (
     // get all village with file count of each village files
 
     const department = await prisma.department.findMany({
+      where: {
+        deletedAt: null,
+      },
       include: {
         file: {
           select: {

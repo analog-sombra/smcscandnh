@@ -171,7 +171,11 @@ const ViewFile = (props: ViewFileProps) => {
             <label htmlFor="year" className="w-60">
               Order Date :
             </label>
-            <p>{formateDate(new Date(filedata.order_date.toString()))}</p>
+            <p>
+              {filedata.order_date
+                ? formateDate(new Date(filedata.order_date.toString()))
+                : ""}
+            </p>
           </div>
           <div className="flex gap-2 items-center  mt-2">
             <label htmlFor="year" className="w-60">
@@ -200,7 +204,7 @@ const ViewFile = (props: ViewFileProps) => {
               <p>{filedata.remarks}</p>
             </div>
           )}
-          {filedata.physicalFileLocationId ? (
+          {filedata.physical_file_locationId ? (
             <div className="flex gap-2 items-start  mt-2">
               <label htmlFor="remark" className="w-60">
                 File Location :

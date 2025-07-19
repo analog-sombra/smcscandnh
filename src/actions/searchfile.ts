@@ -6,6 +6,7 @@ interface SearchFilePayload {
   file_id?: string;
   file_title?: string;
   old_file_no?: string;
+  subject?: string;
   fts_no?: string;
   file_name?: string;
   survey?: string;
@@ -103,6 +104,16 @@ const fileSearch = async (
         keys: ["survey_no"],
       });
       const searchresult = fuse.search(payload.survey);
+      files = searchresult.map((result: any) => result.item);
+    }
+
+    if (payload.subject) {
+      const fuse = new Fuse(files, {
+        isCaseSensitive: false,
+        threshold: 0.2,
+        keys: ["subject"],
+      });
+      const searchresult = fuse.search(payload.subject);
       files = searchresult.map((result: any) => result.item);
     }
 
